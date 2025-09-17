@@ -1,0 +1,489 @@
+<!doctype html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HK Trip Demo</title>
+    <style>
+      :root {
+        --bg: #ffffff;
+        --text: #1a1a1a;
+        --muted: #6b7280;
+        --card: #ffffff;
+        --border: #e5e7eb;
+        --primary: #0a7;
+        --primary-600: #07805b;
+      }
+      .dark {
+        --bg: #0b0f14;
+        --text: #e5e7eb;
+        --muted: #9ca3af;
+        --card: #0f1520;
+        --border: #1f2937;
+        --primary: #22c55e;
+        --primary-600: #16a34a;
+      }
+      * { box-sizing: border-box; }
+      body { font-family: system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans", Ubuntu, Cantarell, "Helvetica Neue", Arial; margin: 0; background: var(--bg); color: var(--text); }
+      header { position: sticky; top: 0; z-index: 10; background: var(--bg); border-bottom: 1px solid var(--border); display:flex; gap:12px; align-items:center; padding: 12px 16px; }
+      main { padding: 16px; max-width: 1100px; margin: 0 auto; }
+      .hero {
+        background: linear-gradient(180deg, rgba(0,0,0,0.45), rgba(0,0,0,0.45)),
+                    url('https://images.unsplash.com/photo-1518684079-3c830dcef090?q=80&w=1600&auto=format&fit=crop');
+        background-size: cover; background-position: center; color: #fff;
+        padding: 48px 16px;
+        border-radius: 16px;
+      }
+      .hero h2 { margin: 0 0 8px 0; font-size: 28px; }
+      .hero-sub { opacity: 0.9; margin-bottom: 16px; }
+      .search-bar { background: rgba(255,255,255,0.95); color: var(--text); border: 1px solid var(--border); border-radius: 12px; padding: 12px; }
+      .search-grid { display: grid; grid-template-columns: 1.2fr 1fr 1fr auto; gap: 8px; align-items: center; }
+      .search-grid input, .search-grid select { height: 42px; }
+      .muted { color: var(--muted); font-size: 12px; }
+      nav a { margin-right: 12px; color: var(--text); text-decoration: none; }
+      nav a:hover { text-decoration: underline; }
+      nav a.active { color: var(--primary); font-weight: 600; }
+      .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 12px 0; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
+      .row { display:flex; gap:8px; flex-wrap:wrap; align-items: center; }
+      input, select { padding: 8px 10px; background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 8px; }
+      button { padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--card); color: var(--text); cursor: pointer; }
+      button:hover { border-color: var(--primary); }
+      .btn-primary { background: var(--primary); color: #fff; border-color: var(--primary); }
+      .btn-primary:hover { background: var(--primary-600); border-color: var(--primary-600); }
+      .hidden { display:none; }
+      .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+      .slot-card h4 { margin: 0 0 8px 0; font-size: 16px; }
+      .slot-header { display:flex; justify-content: space-between; align-items:center; cursor: pointer; }
+      .chip { padding: 2px 8px; border-radius: 999px; border: 1px solid var(--border); font-size: 12px; color: var(--muted); }
+      .qa-progress { width: 100%; height: 8px; background: var(--border); border-radius: 999px; overflow: hidden; }
+      .qa-progress > div { height: 100%; background: var(--primary); width: 0%; transition: width 200ms ease; }
+      .toolbar { margin-left:auto; display:flex; gap:8px; align-items:center; }
+      .switch { display:inline-flex; align-items:center; gap:6px; }
+      .range-wrap { display:flex; flex-direction:column; gap:6px; }
+      .range-row { display:flex; align-items:center; gap:8px; }
+      .range-row output { min-width: 64px; text-align: right; }
+      input[type=range] { -webkit-appearance: none; width: 180px; height: 4px; background: var(--border); border-radius: 999px; outline: none; }
+      input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--primary); cursor: pointer; border: none; }
+      input[type=range]::-moz-range-thumb { width: 16px; height: 16px; border-radius: 50%; background: var(--primary); cursor: pointer; border: none; }
+      .choice-selected { outline: 2px solid var(--primary); }
+      #qaStatus { color: var(--primary); font-size: 12px; margin-top: 6px; min-height: 16px; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h2 style="margin:0">香港行程 Demo</h2>
+      <nav>
+        <a href="#p1">P1 表單</a>
+        <a href="#qa">Q&A</a>
+        <a href="#itinerary">Itinerary</a>
+        <a href="#overview">Overview</a>
+      </nav>
+      <div class="toolbar">
+        <span class="switch"><input type="checkbox" id="themeToggle" /> 深色模式</span>
+        <button id="scrollTopBtn" title="回頂部">Top</button>
+      </div>
+    </header>
+
+    <main>
+      <section id="p1" class="card" data-section="p1">
+        <div class="hero">
+          <h2>香港最佳旅遊和食宿安排</h2>
+          <div class="hero-sub">請選擇您的旅遊日期，以尋找香港最佳旅遊和食宿安排</div>
+          <div class="search-bar">
+            <div class="search-grid">
+              <div>
+                <div class="muted">請輸入出發地</div>
+                <input type="text" id="startPlace" placeholder="香港" />
+              </div>
+              <div>
+                <div class="muted">出發日期</div>
+                <input type="date" id="startDate" />
+              </div>
+              <div>
+                <div class="muted">回程日期</div>
+                <input type="date" id="endDate" />
+              </div>
+              
+              <div>
+                <button id="createPlanBtn" class="btn-primary" style="height:42px">查看安排</button>
+              </div>
+            </div>
+            <div class="row" style="margin-top:8px">
+              <button type="button" id="btnAirport">機場</button>
+              <button type="button" id="btnWestKowloon">西九龍站</button>
+            </div>
+            <div id="weatherHint" style="margin-top:8px;color:#0f0">天氣建議將於建立安排後顯示</div>
+            <div id="planIdWrap" class="hidden" style="margin-top:8px">plan_id: <span id="planId"></span></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="qa" class="card" data-section="qa">
+        <h3>Q&A（3 題範例）</h3>
+        <div id="qaWizard">
+          <div class="row" style="justify-content:space-between">
+            <div id="qaProgressText">1 / 3</div>
+            <div class="qa-progress" style="flex:1; max-width: 300px"><div id="qaProgressBar"></div></div>
+          </div>
+          <div id="qaQuestion" style="margin:8px 0">你此行最期待的是？</div>
+          <div class="grid" id="qaChoices"></div>
+          <div id="qaStatus"></div>
+          <div style="margin-top:8px">
+            <button id="qaPrev">上一題</button>
+            <button id="qaNext" class="btn-primary">下一題</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="itinerary" class="card" data-section="itinerary">
+        <h3>Itinerary（8 槽位）</h3>
+        <div class="row" style="margin-bottom:8px">
+          <button id="regenBtn">重新生成</button>
+        </div>
+        <div id="slots" class="grid"></div>
+      </section>
+
+      <section id="overview" class="card" data-section="overview">
+        <h3>Overview & Export</h3>
+        <div id="overviewSummary" class="row" style="gap:6px; flex-wrap:wrap"></div>
+        <pre id="overviewJson" style="white-space:pre-wrap"></pre>
+        <button id="finalizeBtn">Finalize</button>
+        <button id="pdfBtn">Export PDF</button>
+        <button id="icsBtn">Export ICS</button>
+        <div id="pdfLink"></div>
+      </section>
+    </main>
+
+    <script>
+      const API = 'http://localhost:3001';
+      let currentPlanId = null;
+      let currentBudget = 'medium';
+      const qaData = [
+        { qid: 'q1', text: '你此行最期待的是？', choices: [
+          { cid: 'q1a1', label: '美食' }, { cid: 'q1a2', label: '購物' }, { cid: 'q1a3', label: '文化' }, { cid: 'q1a4', label: '冒險' }
+        ]},
+        { qid: 'q2', text: '偏好活動型態？', choices: [
+          { cid: 'q2a1', label: '戶外' }, { cid: 'q2a2', label: '室內' }, { cid: 'q2a3', label: '輕鬆' }, { cid: 'q2a4', label: '緊湊' }
+        ]},
+        { qid: 'q3', text: '交通偏好？', choices: [
+          { cid: 'q3a1', label: '多步行' }, { cid: 'q3a2', label: '地鐵' }, { cid: 'q3a3', label: '巴士' }, { cid: 'q3a4', label: '計程車' }
+        ]}
+      ];
+      let qaIndex = 0;
+      let qaAnswers = {};
+
+      function setPlanId(id){
+        currentPlanId = id;
+        document.getElementById('planId').textContent = id;
+        document.getElementById('planIdWrap').classList.remove('hidden');
+        refreshOverview();
+      }
+
+      async function createPlan(){
+        try {
+          const start_date = document.getElementById('startDate').value || new Date().toISOString().slice(0,10);
+          const end_date = document.getElementById('endDate').value || new Date(Date.now()+86400000).toISOString().slice(0,10);
+          const destinationInput = document.getElementById('startPlace');
+          const start_place = (destinationInput && destinationInput.value) ? destinationInput.value : 'HKG Airport';
+          const end_place = start_place; // 單輸入欄位情境下，終點等同起點
+          const res = await fetch(API + '/plans', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+              budget: { level: currentBudget, currency: 'HKD' },
+              date_range: { start_date, end_date, nights: 1 },
+              locations: { start_place, end_place }
+            })
+          });
+          if(!res.ok){ throw new Error('HTTP ' + res.status); }
+        const data = await res.json();
+        if(!data.plan_id){ throw new Error('回傳格式錯誤'); }
+        setPlanId(data.plan_id);
+        // 確保 8 槽位
+        try { await fetch(API + '/plans/' + data.plan_id + '/generate', { method: 'POST' }); } catch {}
+        await loadItinerary();
+          await showWeatherHint();
+        } catch (e) {
+          console.error(e);
+          alert('建立計畫失敗，請稍後再試：' + (e?.message || e));
+        }
+      }
+
+      async function answer(q, a){
+        if(!currentPlanId) return alert('請先建立計畫');
+        await fetch(API + '/plans/' + currentPlanId + '/answers', {
+          method: 'POST', headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ question_id: q, selected_choice_id: a })
+        });
+      }
+
+      async function loadItinerary(){
+        if(!currentPlanId) return;
+        let plan = await (await fetch(API + '/plans/' + currentPlanId)).json();
+        let slots = plan.itinerary[0].slots || [];
+        if(slots.length < 8){
+          // 嘗試修復為 8 槽位
+          try { await fetch(API + '/plans/' + currentPlanId + '/generate', { method: 'POST' }); } catch {}
+          plan = await (await fetch(API + '/plans/' + currentPlanId)).json();
+          slots = plan.itinerary[0].slots || [];
+        }
+        // 前端保底：若仍不足 8，補齊缺少的槽位（顯示用途，不影響後端資料）
+        const desired = [
+          { id: 'breakfast',   label: 'Breakfast (08:00–09:00)', type: 'food' },
+          { id: 'morning',     label: 'Morning (09:00–12:00)',   type: 'poi'  },
+          { id: 'lunch',       label: 'Lunch (12:00–13:30)',     type: 'food' },
+          { id: 'afternoon',   label: 'Afternoon (13:30–15:30)', type: 'poi'  },
+          { id: 'evening',     label: 'Evening (15:30–18:30)',   type: 'poi'  },
+          { id: 'dinner',      label: 'Dinner (18:30–20:00)',    type: 'food' },
+          { id: 'night',       label: 'Night (20:00–22:00)',     type: 'poi'  },
+          { id: 'accommodation',label:'Accommodation (22:00–08:00)', type: 'hotel' }
+        ];
+        function mock3(type){
+          const pool = {
+            poi: [
+              { id: 'poi-1', name: '太平山 Victoria Peak', rating: 4.4, img: 'https://picsum.photos/seed/peak/400/240' },
+              { id: 'poi-2', name: '星光大道 Avenue of Stars', rating: 4.5, img: 'https://picsum.photos/seed/avenue/400/240' },
+              { id: 'poi-3', name: '天星小輪 Star Ferry', rating: 4.6, img: 'https://picsum.photos/seed/ferry/400/240' }
+            ],
+            food: [
+              { id: 'food-1', name: '添好運 Tim Ho Wan', rating: 4.4, img: 'https://picsum.photos/seed/timhowan/400/240' },
+              { id: 'food-2', name: '九記牛腩 Kau Kee', rating: 4.5, img: 'https://picsum.photos/seed/kaukee/400/240' },
+              { id: 'food-3', name: '勝香園 Sing Heung Yuen', rating: 4.6, img: 'https://picsum.photos/seed/singheung/400/240' }
+            ],
+            hotel: [
+              { id: 'hotel-1', name: '尖沙咀海景酒店', rating: 4.3, img: 'https://picsum.photos/seed/hotel1/400/240' },
+              { id: 'hotel-2', name: '中環商旅酒店', rating: 4.2, img: 'https://picsum.photos/seed/hotel2/400/240' },
+              { id: 'hotel-3', name: '灣仔精品酒店', rating: 4.1, img: 'https://picsum.photos/seed/hotel3/400/240' }
+            ]
+          };
+          return (pool[type]||[]).map(x=>({ option_id:x.id, title:x.name, images:[x.img], intro:'示意資料', scores:{popularity:x.rating} }));
+        }
+        const mapById = Object.fromEntries(slots.map(s => [s.slot_id, s]));
+        slots = desired.map(d => {
+          if(mapById[d.id]) return mapById[d.id];
+          return { slot_id: d.id, label: d.label, options: mock3(d.type), selected_option_id: null, swipe_history: [] };
+        });
+        const wrap = document.getElementById('slots');
+        wrap.innerHTML = '';
+        slots.forEach(slot => {
+          const div = document.createElement('div');
+          div.className = 'card slot-card';
+          const header = document.createElement('div');
+          header.className = 'slot-header';
+          const title = document.createElement('h4');
+          title.textContent = slot.label;
+          if(slot.selected_option_id){ title.style.color = 'var(--primary)'; }
+          const right = document.createElement('div');
+          const sel = slot.options.find(o => o.option_id === slot.selected_option_id);
+          const chip = document.createElement('span'); chip.className = 'chip'; chip.textContent = sel ? ('已選：' + sel.title) : (slot.options.length + ' 候選');
+          const toggle = document.createElement('button'); toggle.textContent = '展開';
+          right.appendChild(chip); right.appendChild(document.createTextNode(' ')); right.appendChild(toggle);
+          header.appendChild(title); header.appendChild(right);
+          const list = document.createElement('div');
+          list.style.display = 'none';
+          toggle.onclick = () => { const open = list.style.display !== 'none'; list.style.display = open ? 'none' : 'block'; toggle.textContent = open ? '展開' : '收合'; };
+          slot.options.forEach(o => {
+            const item = document.createElement('div');
+            item.className = 'row';
+            const img = document.createElement('img');
+            img.src = o.images?.[0] || '';
+            img.width = 160; img.height = 96; img.style.objectFit = 'cover'; img.style.borderRadius = '8px';
+            const textWrap = document.createElement('div');
+            textWrap.style.flex = '1';
+            const name = document.createElement('div'); name.textContent = o.title + ' (' + (o.scores?.popularity||'') + ')';
+            const intro = document.createElement('div'); intro.textContent = o.intro; intro.style.color = 'var(--muted)'; intro.style.fontSize = '12px';
+            const btns = document.createElement('div');
+            const keep = document.createElement('button'); keep.textContent = '保留'; keep.className = 'btn-primary';
+            keep.onclick = () => swipe(slot.slot_id, 'keep', o.option_id);
+            const remove = document.createElement('button'); remove.textContent = '移除';
+            remove.onclick = () => swipe(slot.slot_id, 'remove', o.option_id);
+            btns.appendChild(keep); btns.appendChild(document.createTextNode(' ')); btns.appendChild(remove);
+            textWrap.appendChild(name); textWrap.appendChild(intro); textWrap.appendChild(btns);
+            item.appendChild(img); item.appendChild(textWrap);
+            list.appendChild(item);
+          });
+          div.appendChild(header);
+          div.appendChild(list);
+          wrap.appendChild(div);
+        });
+      }
+
+      async function swipe(slot_id, action, option_id){
+        if(!currentPlanId) return;
+        await fetch(API + '/plans/' + currentPlanId + '/swipe', {
+          method: 'POST', headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ day_index: 1, slot_id, action, option_id })
+        });
+        await loadItinerary();
+        await refreshOverview();
+      }
+
+      async function refreshOverview(){
+        if(!currentPlanId) return;
+        const plan = await (await fetch(API + '/plans/' + currentPlanId)).json();
+        document.getElementById('overviewJson').textContent = JSON.stringify(plan, null, 2);
+        const sum = document.getElementById('overviewSummary');
+        if(sum){
+          sum.innerHTML = '';
+          const slots = plan.itinerary?.[0]?.slots || [];
+          slots.forEach(s => {
+            const sel = s.options.find(o => o.option_id === s.selected_option_id);
+            const badge = document.createElement('span');
+            badge.className = 'chip';
+            badge.textContent = sel ? `${s.slot_id}: ${sel.title}` : `${s.slot_id}: 未選`;
+            sum.appendChild(badge);
+          });
+        }
+      }
+
+      async function finalize(){
+        if(!currentPlanId) return;
+        await fetch(API + '/plans/' + currentPlanId + '/finalize', { method: 'POST' });
+        await refreshOverview();
+      }
+
+      async function exportPdf(){
+        if(!currentPlanId) return;
+        const res = await fetch(API + '/plans/' + currentPlanId + '/export/pdf', { method: 'POST' });
+        const data = await res.json();
+        document.getElementById('pdfLink').innerHTML = '<a href="' + data.url + '" target="_blank">PDF Link</a>';
+      }
+
+      async function exportIcs(){
+        if(!currentPlanId) return;
+        const res = await fetch(API + '/plans/' + currentPlanId + '/calendar', { method: 'POST' });
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = 'plan-' + currentPlanId + '.ics'; a.click();
+        URL.revokeObjectURL(url);
+      }
+
+      document.getElementById('createPlanBtn').onclick = createPlan;
+      document.getElementById('finalizeBtn').onclick = finalize;
+      document.getElementById('pdfBtn').onclick = exportPdf;
+      document.getElementById('icsBtn').onclick = exportIcs;
+      const regenBtn = document.getElementById('regenBtn');
+      if(regenBtn){
+        regenBtn.onclick = async () => {
+          if(!currentPlanId) return alert('請先建立計畫');
+          await fetch(API + '/plans/' + currentPlanId + '/generate', { method: 'POST' });
+          await loadItinerary();
+        };
+      }
+
+      // Price range live output
+      function bindRange(id, outId){
+        const el = document.getElementById(id);
+        const out = document.getElementById(outId);
+        if(el && out){
+          const sync = () => { out.textContent = String(el.value); };
+          el.addEventListener('input', sync);
+          sync();
+        }
+      }
+      bindRange('priceMin','priceMinOut');
+      bindRange('priceMax','priceMaxOut');
+
+      // Budget quick buttons
+      document.querySelectorAll('.budgetBtn').forEach(btn => {
+        btn.onclick = () => {
+          currentBudget = btn.dataset.budget;
+          document.querySelectorAll('.budgetBtn').forEach(b => b.style.outline = '');
+          btn.style.outline = '2px solid #0a7';
+        };
+      });
+      // Quick places -> fill focused input (start/end); default to start
+      function setQuickPlace(text){
+        const el = document.activeElement;
+        const isStart = el && el.id === 'startPlace';
+        const isEnd = el && el.id === 'endPlace';
+        const target = isStart ? el : (isEnd ? el : document.getElementById('startPlace'));
+        target.value = text;
+      }
+      document.getElementById('btnAirport').onclick = () => setQuickPlace('Airport');
+      document.getElementById('btnWestKowloon').onclick = () => setQuickPlace('Hong Kong West Kowloon Station');
+
+      async function showWeatherHint(){
+        try{
+          const start_date = document.getElementById('startDate').value || new Date().toISOString().slice(0,10);
+          document.getElementById('weatherHint').textContent = '查詢天氣中…';
+          const res = await fetch(API + '/weather?date=' + encodeURIComponent(start_date));
+          if(!res.ok) throw new Error('weather http ' + res.status);
+          const w = await res.json();
+          document.getElementById('weatherHint').textContent = `${w.summary}，${w.advice}`;
+        } catch(e){
+          document.getElementById('weatherHint').textContent = 'Sunny，適合戶外行程';
+        }
+      }
+
+      // QA wizard
+      function renderQA(){
+        const q = qaData[qaIndex];
+        const progressText = document.getElementById('qaProgressText');
+        const progressBar = document.getElementById('qaProgressBar');
+        if(progressText) progressText.textContent = `${qaIndex+1} / ${qaData.length}`;
+        if(progressBar) progressBar.style.width = Math.round(((qaIndex+1)/qaData.length)*100) + '%';
+        document.getElementById('qaQuestion').textContent = q.text;
+        const box = document.getElementById('qaChoices');
+        box.innerHTML = '';
+        const status = document.getElementById('qaStatus');
+        if(status) status.textContent = '';
+        q.choices.forEach(c => {
+          const btn = document.createElement('button');
+          btn.textContent = c.label;
+          btn.onclick = async () => {
+            qaAnswers[q.qid] = c.cid;
+            const prev = box.querySelector('.choice-selected');
+            if(prev) prev.classList.remove('choice-selected');
+            btn.classList.add('choice-selected');
+            try {
+              await answer(q.qid, c.cid);
+              if(status) status.textContent = '已送出：' + c.label;
+            } catch(e) {
+              if(status) status.textContent = '送出失敗，請重試';
+            }
+          };
+          box.appendChild(btn);
+        });
+      }
+      document.getElementById('qaPrev').onclick = () => {
+        if(qaIndex>0){ qaIndex--; renderQA(); }
+      };
+      document.getElementById('qaNext').onclick = () => {
+        if(qaIndex<qaData.length-1){ qaIndex++; renderQA(); }
+      };
+      renderQA();
+
+      // Theme toggle & scroll top
+      const root = document.documentElement;
+      const themeToggle = document.getElementById('themeToggle');
+      const savedTheme = localStorage.getItem('theme') || 'light';
+      if(savedTheme === 'dark'){ root.classList.add('dark'); if(themeToggle) themeToggle.checked = true; }
+      if(themeToggle){
+        themeToggle.onchange = () => {
+          if(themeToggle.checked){ root.classList.add('dark'); localStorage.setItem('theme','dark'); }
+          else { root.classList.remove('dark'); localStorage.setItem('theme','light'); }
+        };
+      }
+      const scrollTopBtn = document.getElementById('scrollTopBtn');
+      if(scrollTopBtn){ scrollTopBtn.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' }); }
+
+      // Single-section focus via hash routing
+      function updateSectionByHash(){
+        const hash = (location.hash || '#p1').replace('#','');
+        document.querySelectorAll('section[data-section]').forEach(sec => {
+          sec.style.display = (sec.dataset.section === hash) ? 'block' : 'none';
+        });
+        document.querySelectorAll('nav a').forEach(a => {
+          const id = a.getAttribute('href').replace('#','');
+          if(id === hash) a.classList.add('active'); else a.classList.remove('active');
+        });
+      }
+      window.addEventListener('hashchange', updateSectionByHash);
+      updateSectionByHash();
+    </script>
+  </body>
+  </html>
+
+

@@ -1,0 +1,30 @@
+{
+  "plan_id": "demo123",
+  "created_at": "2025-01-01T00:00:00.000Z",
+  "updated_at": "2025-01-01T00:00:00.000Z",
+  "version": "0.1.0",
+  "inputs": {
+    "budget": {"level": "medium", "currency": "HKD", "min": 500, "max": 3000},
+    "date_range": {"start_date": "2025-12-01", "end_date": "2025-12-02", "nights": 1},
+    "locations": {"start_place": "HKG Airport", "end_place": "West Kowloon"}
+  },
+  "context": {"weather": []},
+  "expectation_answers": [],
+  "preference_profile": {},
+  "itinerary": [
+    {
+      "day_index": 1,
+      "date": "2025-12-01",
+      "slots": [
+        {"slot_id": "morning", "label": "Morning (09:00–12:00)", "options": [], "selected_option_id": null, "swipe_history": []},
+        {"slot_id": "lunch", "label": "Lunch (12:00–13:30)", "options": [], "selected_option_id": null, "swipe_history": []},
+        {"slot_id": "afternoon", "label": "Afternoon (13:30–15:30)", "options": [], "selected_option_id": null, "swipe_history": []}
+      ]
+    }
+  ],
+  "final_selection": {},
+  "exports": {},
+  "audit": []
+}
+
+

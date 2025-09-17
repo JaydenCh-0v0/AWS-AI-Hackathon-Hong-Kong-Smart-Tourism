@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "TravelPlan",
+  "type": "object",
+  "required": ["plan_id", "created_at", "inputs", "itinerary"],
+  "properties": {
+    "plan_id": {"type": "string"},
+    "created_at": {"type": "string", "format": "date-time"},
+    "updated_at": {"type": "string", "format": "date-time"},
+    "version": {"type": "string"},
+    "inputs": {
+      "type": "object",
+      "required": ["budget", "date_range", "locations"],
+      "properties": {
+        "budget": {
+          "type": "object",
+          "required": ["level", "currency"],
+          "properties": {
+            "level": {"enum": ["low", "medium", "high"]},
+            "currency": {"const": "HKD"},
+            "min": {"type": "number"},
+            "max": {"type": "number"}
+          }
+        },
+        "date_range": {
+          "type": "object",
+          "required": ["start_date", "end_date"],
+          "properties": {
+            "start_date": {"type": "string", "format": "date"},
+            "end_date": {"type": "string", "format": "date"},
+            "nights": {"type": "integer", "minimum": 0}
+          }
+        },
+        "locations": {
+          "type": "object",
+          "required": ["start_place", "end_place"],
+          "properties": {
+            "start_place": {"type": "string"},
+            "end_place": {"type": "string"}
+          }
+        }
+      }
+    },
+    "context": {"type": "object"},
+    "expectation_answers": {"type": "array"},
+    "preference_profile": {"type": "object"},
+    "itinerary": {"type": "array"},
+    "final_selection": {"type": "object"},
+    "exports": {"type": "object"},
+    "audit": {"type": "array"}
+  }
+}
+
+
