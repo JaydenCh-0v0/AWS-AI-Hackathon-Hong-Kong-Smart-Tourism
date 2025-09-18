@@ -111,13 +111,6 @@ function ensureEightSlots(plan) {
   return plan;
 }
 
-function selectDefaultsForSlots(slots) {
-  for (const slot of slots) {
-    if (!slot.selected_option_id && Array.isArray(slot.options) && slot.options.length > 0) {
-      slot.selected_option_id = slot.options[0].option_id;
-    }
-  }
-}
 
 // POST /plans — create plan from inputs
 app.post('/plans', (req, res) => {
@@ -128,7 +121,6 @@ app.post('/plans', (req, res) => {
   // Fill mock options for 8 slots
   const day0 = plan.itinerary[0];
   fillOptionsForSlots(day0.slots);
-  selectDefaultsForSlots(day0.slots);
   plans.set(plan.plan_id, plan);
   res.json({ plan_id: plan.plan_id });
 });
@@ -168,14 +160,14 @@ app.post('/plans/:id/generate', (req, res) => {
   if (!plan) return res.status(404).json({ error: 'plan not found' });
   ensureEightSlots(plan);
   const day0 = plan.itinerary[0];
-  // Refill empty options just in case and set defaults for unselected
+  // Refill empty options just in case, do not auto-select
   for (const slot of day0.slots) {
     if (!Array.isArray(slot.options) || slot.options.length === 0) {
       const type = slot.slot_id === 'breakfast' || slot.slot_id === 'lunch' || slot.slot_id === 'dinner' ? 'food' : (slot.slot_id === 'accommodation' ? 'hotel' : 'poi');
       slot.options = mockOptions(type);
     }
+    slot.selected_option_id = slot.selected_option_id || null;
   }
-  selectDefaultsForSlots(day0.slots);
   res.json({ ok: true });
 });
 
