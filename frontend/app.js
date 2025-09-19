@@ -278,6 +278,45 @@ async function exportIcs(){
   URL.revokeObjectURL(url);
 }
 
+// 日期限制功能
+function setupDateValidation() {
+  const startDateInput = document.getElementById('startDate');
+  const endDateInput = document.getElementById('endDate');
+  
+  // 设置今天为最小日期
+  const today = new Date().toISOString().slice(0, 10);
+  startDateInput.min = today;
+  endDateInput.min = today;
+  
+  // 当出发日期改变时，更新回程日期的最小值
+  startDateInput.addEventListener('change', function() {
+    const startDate = this.value;
+    if (startDate) {
+      endDateInput.min = startDate;
+      // 如果回程日期早于出发日期，清空回程日期
+      if (endDateInput.value && endDateInput.value < startDate) {
+        endDateInput.value = '';
+      }
+    } else {
+      endDateInput.min = today;
+    }
+  });
+  
+  // 当回程日期改变时，验证不能早于出发日期
+  endDateInput.addEventListener('change', function() {
+    const startDate = startDateInput.value;
+    const endDate = this.value;
+    
+    if (startDate && endDate && endDate < startDate) {
+      alert('回程日期不能早于出发日期');
+      this.value = '';
+    }
+  });
+}
+
+// 页面加载时设置日期验证
+document.addEventListener('DOMContentLoaded', setupDateValidation);
+
 // Bindings
 document.getElementById('createPlanBtn').onclick = createPlan;
 document.getElementById('finalizeBtn').onclick = finalize;
