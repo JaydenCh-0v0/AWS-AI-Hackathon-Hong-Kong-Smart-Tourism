@@ -22,7 +22,7 @@ header { position: sticky; top: 0; z-index: 10; background: var(--bg); border-bo
 main { padding: 16px; max-width: 1100px; margin: 0 auto; }
 .hero {
   background: linear-gradient(180deg, rgba(0,0,0,0.45), rgba(0,0,0,0.45)),
-              url('https://images.unsplash.com/photo-1518684079-3c830dcef090?q=80&w=1600&auto=format&fit=crop');
+              url('https://media.vogue.com.tw/photos/65646476583aa61896f20dc1/master/w_1600,c_limit/629604122');
   background-size: cover; background-position: center; color: #fff;
   padding: 48px 16px;
   border-radius: 16px;
