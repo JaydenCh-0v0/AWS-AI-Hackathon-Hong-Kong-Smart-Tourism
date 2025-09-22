@@ -130,19 +130,40 @@ function generateDayTabs() {
     tab.className = 'day-tab';
     if (dayIndex === currentDayIndex) tab.classList.add('active');
     tab.textContent = `Day ${dayIndex + 1} (${currentDate.getMonth() + 1}/${currentDate.getDate()})`;
-    tab.onclick = () => switchDay(dayIndex);
+    const currentDayIdx = dayIndex; // 保存當前 dayIndex
+    tab.onclick = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      switchDay(currentDayIdx);
+    };
     tab.style.cursor = 'pointer';
     dayTabs.appendChild(tab);
     
     currentDate.setDate(currentDate.getDate() + 1);
     dayIndex++;
   }
+  
+  // 在右邊添加完成規劃按鈕
+  const completeBtn = document.createElement('button');
+  completeBtn.className = 'btn-primary complete-btn';
+  completeBtn.textContent = '✅ 完成';
+  completeBtn.onclick = () => {
+    updateSectionVisibility(['p1', 'weather', 'qa', 'itinerary', 'overview']);
+  };
+  dayTabs.appendChild(completeBtn);
 }
 
 function switchDay(dayIndex) {
+  console.log('Switching to day:', dayIndex);
   currentDayIndex = dayIndex;
+  
+  // 更新 tab active 狀態
   document.querySelectorAll('.day-tab').forEach((tab, idx) => {
-    tab.classList.toggle('active', idx === dayIndex);
+    if (idx === dayIndex) {
+      tab.classList.add('active');
+    } else {
+      tab.classList.remove('active');
+    }
   });
   
   // 如果該日期還沒有行程，初始化
@@ -151,6 +172,10 @@ function switchDay(dayIndex) {
   }
   
   currentSlots = allDaysSlots[currentDayIndex];
+  
+  // 更新天氣資訊為當前選中的日期
+  updateWeatherInfo();
+  
   renderSlotList(currentSlots);
   if(currentSlots.length > 0) renderStackForSlot(currentSlots[0]);
 }
@@ -251,7 +276,7 @@ function renderStackForSlot(slot){
     card.style.transform = `translateY(${idx*8}px) scale(${1 - idx*0.04})`;
     const img = document.createElement('img'); img.src = o.images?.[0] || '';
     const label = document.createElement('div'); label.className = 'card-label'; label.textContent = `${o.title}  (${o.scores?.popularity||''})`;
-    const intro = document.createElement('div'); intro.className = 'card-intro'; intro.textContent = o.intro || '示意資料，僅供 Demo 使用';
+    const intro = document.createElement('div'); intro.className = 'card-intro'; intro.textContent = o.intro || '-';
     const toolbar = document.createElement('div'); toolbar.className = 'card-toolbar';
     const btnAgain = document.createElement('button'); btnAgain.className = 'round-btn again'; btnAgain.textContent = '⟲';
     const btnReject = document.createElement('button'); btnReject.className = 'round-btn reject'; btnReject.textContent = '✕';
@@ -380,10 +405,12 @@ function setupDateValidation() {
 // 页面加载时设置日期验证和预设日期
 document.addEventListener('DOMContentLoaded', () => {
   setupDateValidation();
-  // 设置预设日期为今天
-  const today = new Date().toISOString().slice(0, 10);
-  document.getElementById('startDate').value = today;
-  document.getElementById('endDate').value = today;
+  // 设置预设日期：出发日期和回程日期都为明天
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  
+  document.getElementById('startDate').value = tomorrow.toISOString().slice(0, 10);
+  document.getElementById('endDate').value = tomorrow.toISOString().slice(0, 10);
 });
 
 // Bindings
@@ -427,8 +454,31 @@ function showWeatherCard() {
 }
 
 async function updateWeatherInfo(){
+  const selectedDate = getSelectedDate();
+  const today = new Date();
+  const maxDate = new Date(today);
+  maxDate.setDate(today.getDate() + 8);
+  
+  // 更新日期顯示
+  const dateStr = selectedDate.toLocaleDateString('zh-TW', { 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric',
+    weekday: 'long'
+  });
+  document.getElementById('weatherDate').textContent = dateStr;
+  
+  // 檢查日期是否超過 8 天
+  if (selectedDate > maxDate) {
+    document.getElementById('weatherStatus').textContent = '無法獲取天氣資訊';
+    document.getElementById('weatherTemp').textContent = '--';
+    document.getElementById('weatherDesc').textContent = '無資料';
+    document.getElementById('adviceContent').textContent = '無法提供超過 8 天的天氣預報';
+    return;
+  }
+  
   try{
-    const start_date = document.getElementById('startDate').value || new Date().toISOString().slice(0,10);
+    const dateStr = selectedDate.toISOString().slice(0,10);
     
     // 更新狀態
     document.getElementById('weatherStatus').textContent = '正在獲取天氣資訊...';
@@ -436,7 +486,7 @@ async function updateWeatherInfo(){
     document.getElementById('weatherDesc').textContent = '載入中...';
     document.getElementById('adviceContent').textContent = '正在分析最佳旅遊建議...';
     
-    const res = await fetch(API + '/weather?date=' + encodeURIComponent(start_date));
+    const res = await fetch(API + '/weather?date=' + encodeURIComponent(dateStr));
     if(!res.ok) throw new Error('weather http ' + res.status);
     const w = await res.json();
     
@@ -452,6 +502,22 @@ async function updateWeatherInfo(){
     document.getElementById('weatherDesc').textContent = '晴朗';
     document.getElementById('adviceContent').textContent = '天氣良好，適合戶外活動。建議攜帶防曬用品，穿著輕便舒適的服裝。';
   }
+}
+
+function getSelectedDate() {
+  const startDate = document.getElementById('startDate').value;
+  const endDate = document.getElementById('endDate').value;
+  
+  if (!startDate || !endDate) return new Date();
+  
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  
+  // 根據 currentDayIndex 計算當前選中的日期
+  const selectedDate = new Date(start);
+  selectedDate.setDate(start.getDate() + currentDayIndex);
+  
+  return selectedDate;
 }
 
 // 更新 section 顯示狀態
@@ -501,7 +567,7 @@ function addQAButton() {
   const weatherCard = document.getElementById('weather');
   if (weatherCard && !weatherCard.querySelector('.start-qa-btn')) {
     const qaButton = document.createElement('button');
-    qaButton.className = 'btn-primary start-qa-btn';
+    qaButton.className = 'btn-primary';
     qaButton.textContent = '🤔 開始個人化問答';
     qaButton.style.marginTop = '16px';
     qaButton.onclick = startQA;
@@ -628,3 +694,63 @@ renderQA();
 
 // 初始化顯示狀態
 updateSectionVisibility(['p1']);
+
+// AI Agent Chat
+document.getElementById('aiAgent').onclick = () => {
+  document.getElementById('chatRoom').classList.remove('hidden');
+};
+
+document.getElementById('chatClose').onclick = (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  document.getElementById('chatRoom').classList.add('hidden');
+};
+
+document.getElementById('chatSend').onclick = async () => {
+  const textarea = document.getElementById('chatTextarea');
+  const message = textarea.value.trim();
+  if (!message) return;
+  
+  // 添加用戶消息
+  addMessage(message, 'user');
+  textarea.value = '';
+  
+  // 模擬 AI 回應
+  setTimeout(() => {
+    const aiResponse = generateAIResponse(message);
+    addMessage(aiResponse, 'ai');
+  }, 1000);
+};
+
+function addMessage(content, type) {
+  const messagesContainer = document.getElementById('chatMessages');
+  const messageDiv = document.createElement('div');
+  messageDiv.className = `message ${type}-message`;
+  
+  const contentDiv = document.createElement('div');
+  contentDiv.className = 'message-content';
+  contentDiv.textContent = content;
+  
+  messageDiv.appendChild(contentDiv);
+  messagesContainer.appendChild(messageDiv);
+  messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+function generateAIResponse(userMessage) {
+  const responses = [
+    '我建議你可以在早上安排太平山，下午去星光大道！',
+    '根據天氣預報，建議安排室內活動如購物或博物館參觀。',
+    '我可以幫你自動完成今天的行程安排，需要我開始嗎？',
+    '這個景點很棒！我推薦你也可以考慮附近的其他景點。',
+    '讓我為你優化一下交通路線，這樣會更省時間。'
+  ];
+  return responses[Math.floor(Math.random() * responses.length)];
+}
+
+// Enter key support
+document.getElementById('chatTextarea').addEventListener('keypress', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    document.getElementById('chatSend').click();
+  }
+});

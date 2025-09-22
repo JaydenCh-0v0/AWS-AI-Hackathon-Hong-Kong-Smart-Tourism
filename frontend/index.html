@@ -22,7 +22,7 @@
     </header>
 
     <main>
-      <section id="p1" class="card" data-section="p1">
+      <section id="p1" class="" data-section="p1">
         <div class="hero">
           <h2>🏙️ 香港智慧旅遊規劃</h2>
           <div class="hero-sub">AI 為您量身打造最佳旅遊體驗，從住宿到美食一應俱全</div>
@@ -41,7 +41,7 @@
                 <input type="date" id="endDate" />
               </div>
               <div>
-                <button id="createPlanBtn" class="btn-primary" style="height:42px">🚀 開始規劃</button>
+                <button id="createPlanBtn" class="btn-primary">🚀 開始規劃</button>
               </div>
             </div>
             <div class="quick-locations">
@@ -57,6 +57,7 @@
       <section id="weather" class="card weather-card hidden" data-section="weather">
         <div class="weather-header">
           <h3>🌤️ 天氣建議</h3>
+          <div class="weather-date" id="weatherDate"></div>
           <div class="weather-status" id="weatherStatus">正在獲取天氣資訊...</div>
         </div>
         <div class="weather-content">
@@ -99,6 +100,32 @@
         <div class="slot-container">
           <div class="slot-list" id="slotList"></div>
           <div class="stack" id="cardStack"></div>
+        </div>
+        
+        <!-- AI Agent -->
+        <div class="ai-agent" id="aiAgent">
+          <img src="romer_frog.png" alt="AI Assistant" class="ai-avatar" />
+        </div>
+        
+        <!-- Chat Room -->
+        <div class="chat-room hidden" id="chatRoom">
+          <div class="chat-header">
+            <span>🐸 AI 旅遊助手</span>
+            <button class="chat-close" id="chatClose">✕</button>
+          </div>
+          <div class="chat-messages" id="chatMessages">
+            <div class="message ai-message">
+              <div class="message-content">
+                你好！我是你的AI旅遊助手 🐸<br>
+                我可以幫你調整行程、推薦景點，或自動完成旅遊規劃。<br>
+                有什麼需要協助的嗎？
+              </div>
+            </div>
+          </div>
+          <div class="chat-input">
+            <textarea id="chatTextarea" placeholder="輸入你的需求..." rows="2"></textarea>
+            <button id="chatSend" class="btn-primary">發送</button>
+          </div>
         </div>
       </section>
 
