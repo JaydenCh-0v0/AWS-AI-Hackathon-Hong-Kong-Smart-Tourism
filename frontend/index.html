@@ -24,39 +24,56 @@
     <main>
       <section id="p1" class="card" data-section="p1">
         <div class="hero">
-          <h2>香港最佳旅遊和食宿安排</h2>
-          <div class="hero-sub">請選擇您的旅遊日期，以尋找香港最佳旅遊和食宿安排</div>
+          <h2>🏙️ 香港智慧旅遊規劃</h2>
+          <div class="hero-sub">AI 為您量身打造最佳旅遊體驗，從住宿到美食一應俱全</div>
           <div class="search-bar">
             <div class="search-grid">
               <div>
-                <div class="muted">請輸入出發地</div>
-                <input type="text" id="startPlace" placeholder="香港" />
+                <div class="muted">📍 出發地點</div>
+                <input type="text" id="startPlace" placeholder="香港國際機場" />
               </div>
               <div>
-                <div class="muted">出發日期</div>
+                <div class="muted">📅 出發日期</div>
                 <input type="date" id="startDate" />
               </div>
               <div>
-                <div class="muted">回程日期</div>
+                <div class="muted">📅 回程日期</div>
                 <input type="date" id="endDate" />
               </div>
-              
               <div>
-                <button id="createPlanBtn" class="btn-primary" style="height:42px">查看安排</button>
+                <button id="createPlanBtn" class="btn-primary" style="height:42px">🚀 開始規劃</button>
               </div>
             </div>
-            <div class="row" style="margin-top:8px">
-              <button type="button" id="btnAirport">機場</button>
-              <button type="button" id="btnWestKowloon">西九龍站</button>
+            <div class="quick-locations">
+              <span class="muted">快速選擇：</span>
+              <button type="button" id="btnAirport" class="location-chip">✈️ 機場</button>
+              <button type="button" id="btnWestKowloon" class="location-chip">🚄 西九龍站</button>
             </div>
-            <div id="weatherHint" style="margin-top:8px;color:rgb(0, 128, 0)">天氣建議將於建立安排後顯示</div>
-            <div id="planIdWrap" class="hidden" style="margin-top:8px">plan_id: <span id="planId"></span></div>
+            <div id="planIdWrap" class="hidden plan-info">計劃編號: <span id="planId"></span></div>
           </div>
         </div>
       </section>
 
-      <section id="qa" class="card" data-section="qa">
-        <h3>Q&A（3 題範例）</h3>
+      <section id="weather" class="card weather-card hidden" data-section="weather">
+        <div class="weather-header">
+          <h3>🌤️ 天氣建議</h3>
+          <div class="weather-status" id="weatherStatus">正在獲取天氣資訊...</div>
+        </div>
+        <div class="weather-content">
+          <div class="weather-main" id="weatherMain">
+            <div class="weather-temp" id="weatherTemp">--°C</div>
+            <div class="weather-desc" id="weatherDesc">載入中...</div>
+          </div>
+          <div class="weather-advice" id="weatherAdvice">
+            <div class="advice-title">💡 旅遊建議</div>
+            <div class="advice-content" id="adviceContent">正在分析最佳旅遊建議...</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="qa" class="card qa-card hidden" data-section="qa">
+        <h3>🤔 個人化問答</h3>
+        <div class="qa-subtitle">幫助我們了解您的旅遊偏好，為您推薦最合適的行程</div>
         <div id="qaWizard">
           <div class="row" style="justify-content:space-between">
             <div id="qaProgressText">1 / 3</div>
@@ -72,8 +89,10 @@
         </div>
       </section>
 
-      <section id="itinerary" class="card" data-section="itinerary">
-        <h3>Itinerary</h3>
+      <section id="itinerary" class="card itinerary-card hidden" data-section="itinerary">
+        <h3>📋 您的專屬行程</h3>
+        <div class="itinerary-subtitle">根據您的偏好量身打造的完美旅程</div>
+        <div class="day-tabs" id="dayTabs"></div>
         <div class="row" style="margin-bottom:8px">
           <button id="regenBtn">重新生成</button>
         </div>
@@ -94,7 +113,7 @@
       </section>
     </main>
 
-    <script src="./app.js" defer></script>
+    <script src="./app_final.js" defer></script>
   </body>
   </html>
 
