@@ -422,8 +422,29 @@ const regenBtn = document.getElementById('regenBtn');
 if(regenBtn){
   regenBtn.onclick = async () => {
     if(!currentPlanId) return alert('請先建立計畫');
-    await fetch(API + '/plans/' + currentPlanId + '/generate', { method: 'POST' });
-    await loadItinerary();
+    
+    // 顯示載入狀態
+    regenBtn.textContent = '🤖 AI 生成中...';
+    regenBtn.disabled = true;
+    
+    try {
+      const response = await fetch(API + '/plans/' + currentPlanId + '/generate', { method: 'POST' });
+      const data = await response.json();
+      
+      // 如果有 AI 推薦，顯示通知
+      if (data.ai_recommendations && data.ai_recommendations.recommendations) {
+        const count = data.ai_recommendations.recommendations.length;
+        addMessage(`🎯 我已根據您的偏好生成了 ${count} 個新推薦！`, 'ai');
+      }
+      
+      await loadItinerary();
+    } catch (error) {
+      console.error('Generation failed:', error);
+      alert('AI 生成失敗，請稍後再試');
+    } finally {
+      regenBtn.textContent = '重新生成';
+      regenBtn.disabled = false;
+    }
   };
 }
 
@@ -715,11 +736,23 @@ document.getElementById('chatSend').onclick = async () => {
   addMessage(message, 'user');
   textarea.value = '';
   
-  // 模擬 AI 回應
-  setTimeout(() => {
-    const aiResponse = generateAIResponse(message);
-    addMessage(aiResponse, 'ai');
-  }, 1000);
+  // 顯示載入中
+  addMessage('呱呱努力思考中...', 'thinking');
+  
+  try {
+    const response = await sendChatMessage(message);
+    // 移除載入訊息
+    const loadingMsg = document.querySelector('.thinking-message');
+    if (loadingMsg) loadingMsg.remove();
+    
+    addMessage(response, 'ai');
+  } catch (error) {
+    // 移除載入訊息並顯示錯誤
+    const loadingMsg = document.querySelector('.thinking-message');
+    if (loadingMsg) loadingMsg.remove();
+    
+    addMessage('抱歉，我現在無法回應，請稍後再試。', 'ai');
+  }
 };
 
 function addMessage(content, type) {
@@ -729,22 +762,52 @@ function addMessage(content, type) {
   
   const contentDiv = document.createElement('div');
   contentDiv.className = 'message-content';
-  contentDiv.textContent = content;
   
-  messageDiv.appendChild(contentDiv);
-  messagesContainer.appendChild(messageDiv);
+  if (type === 'ai') {
+    // AI 訊息使用打字機效果
+    messageDiv.classList.add('typing');
+    contentDiv.textContent = '';
+    messageDiv.appendChild(contentDiv);
+    messagesContainer.appendChild(messageDiv);
+    
+    // 逐字顯示
+    let i = 0;
+    const typeWriter = () => {
+      if (i < content.length) {
+        contentDiv.textContent += content.charAt(i);
+        i++;
+        setTimeout(typeWriter, 50);
+      } else {
+        messageDiv.classList.remove('typing');
+      }
+    };
+    typeWriter();
+  } else {
+    contentDiv.textContent = content;
+    messageDiv.appendChild(contentDiv);
+    messagesContainer.appendChild(messageDiv);
+  }
+  
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
 
-function generateAIResponse(userMessage) {
-  const responses = [
-    '我建議你可以在早上安排太平山，下午去星光大道！',
-    '根據天氣預報，建議安排室內活動如購物或博物館參觀。',
-    '我可以幫你自動完成今天的行程安排，需要我開始嗎？',
-    '這個景點很棒！我推薦你也可以考慮附近的其他景點。',
-    '讓我為你優化一下交通路線，這樣會更省時間。'
-  ];
-  return responses[Math.floor(Math.random() * responses.length)];
+async function sendChatMessage(message) {
+  if (!currentPlanId) {
+    return '請先建立旅遊計畫，我才能為您提供個人化建議。';
+  }
+  
+  const response = await fetch(`${API}/plans/${currentPlanId}/chat`, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ message })
+  });
+  
+  if (!response.ok) {
+    throw new Error('Chat API failed');
+  }
+  
+  const data = await response.json();
+  return data.response;
 }
 
 // Enter key support

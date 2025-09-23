@@ -5,6 +5,7 @@ import { createEvents } from 'ics';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { fetchHkoNineDay, extractDailyForecastNineDay, weatherAdviceFromSummary } from './integrations/hko.js';
+import aiAgent from './services/agent.js';
 
 const app = express();
 app.use(cors());
@@ -154,21 +155,39 @@ app.post('/plans/:id/answers', (req, res) => {
   res.json({ ok: true });
 });
 
-// POST /plans/:id/generate — no-op for demo (already filled)
-app.post('/plans/:id/generate', (req, res) => {
+// POST /plans/:id/generate — AI-enhanced generation
+app.post('/plans/:id/generate', async (req, res) => {
   const plan = plans.get(req.params.id);
   if (!plan) return res.status(404).json({ error: 'plan not found' });
   ensureEightSlots(plan);
-  const day0 = plan.itinerary[0];
-  // Refill empty options just in case, do not auto-select
-  for (const slot of day0.slots) {
-    if (!Array.isArray(slot.options) || slot.options.length === 0) {
-      const type = slot.slot_id === 'breakfast' || slot.slot_id === 'lunch' || slot.slot_id === 'dinner' ? 'food' : (slot.slot_id === 'accommodation' ? 'hotel' : 'poi');
-      slot.options = mockOptions(type);
+  
+  try {
+    // Get AI recommendations based on user profile
+    const userProfile = plan.preference_profile;
+    const weatherData = plan.context.weather;
+    const budget = plan.inputs.budget;
+    
+    const aiRecommendations = await aiAgent.generateItineraryRecommendations(
+      userProfile, weatherData, budget
+    );
+    
+    // Store AI recommendations in plan
+    plan.ai_recommendations = aiRecommendations;
+    
+    const day0 = plan.itinerary[0];
+    for (const slot of day0.slots) {
+      if (!Array.isArray(slot.options) || slot.options.length === 0) {
+        const type = slot.slot_id === 'breakfast' || slot.slot_id === 'lunch' || slot.slot_id === 'dinner' ? 'food' : (slot.slot_id === 'accommodation' ? 'hotel' : 'poi');
+        slot.options = mockOptions(type);
+      }
+      slot.selected_option_id = slot.selected_option_id || null;
     }
-    slot.selected_option_id = slot.selected_option_id || null;
+    
+    res.json({ ok: true, ai_recommendations: aiRecommendations });
+  } catch (error) {
+    console.error('AI generation error:', error);
+    res.json({ ok: true, ai_recommendations: [] });
   }
-  res.json({ ok: true });
 });
 
 // POST /plans/:id/swipe — record swipe and selection
@@ -236,6 +255,38 @@ app.post('/plans/:id/calendar', (req, res) => {
   res.setHeader('Content-Type', 'text/calendar; charset=utf-8');
   res.setHeader('Content-Disposition', `attachment; filename=plan-${plan.plan_id}.ics`);
   res.send(value);
+});
+
+// POST /plans/:id/chat — AI chat endpoint
+app.post('/plans/:id/chat', async (req, res) => {
+  const plan = plans.get(req.params.id);
+  if (!plan) return res.status(404).json({ error: 'plan not found' });
+  
+  const { message } = req.body || {};
+  if (!message) return res.status(400).json({ error: 'message required' });
+  
+  try {
+    const context = {
+      plan: plan,
+      preferences: plan.preference_profile,
+      weather: plan.context.weather
+    };
+    
+    const response = await aiAgent.chatWithUser(message, context);
+    
+    // Store chat history
+    if (!plan.chat_history) plan.chat_history = [];
+    plan.chat_history.push({
+      user_message: message,
+      ai_response: response,
+      timestamp: new Date().toISOString()
+    });
+    
+    res.json({ response });
+  } catch (error) {
+    console.error('Chat error:', error);
+    res.status(500).json({ error: 'chat failed' });
+  }
 });
 
 // Serve static frontend for demo
