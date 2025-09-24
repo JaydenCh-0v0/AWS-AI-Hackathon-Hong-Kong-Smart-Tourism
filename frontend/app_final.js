@@ -302,7 +302,15 @@ function renderStackForSlot(slot){
   options.forEach((o, idx) => {
     const card = document.createElement('div'); card.className = 'card-item';
     card.style.transform = `translateY(${idx*8}px) scale(${1 - idx*0.04})`;
-    const img = document.createElement('img'); img.src = o.images?.[0] || 'https://picsum.photos/400/240?random=' + Math.floor(Math.random()*1000);
+    const img = document.createElement('img'); 
+    // Force reload images to bypass cache
+    const imageUrl = o.images?.[0] || 'https://picsum.photos/400/240?random=' + Math.floor(Math.random()*1000);
+    img.src = imageUrl + (imageUrl.includes('?') ? '&' : '?') + 't=' + Date.now();
+    img.onerror = () => {
+      // Fallback to a different Unsplash image if the first one fails
+      img.src = `https://source.unsplash.com/400x240/?hong-kong,travel&t=${Date.now()}`;
+    };
+    console.log('🖼️ Loading image:', img.src);
     
     // 更好的評分顯示
     const rating = o.scores?.popularity || o.rating || 4.0;
@@ -501,8 +509,14 @@ if(regenBtn){
         addMessage(`🎯 我已根據您的偏好生成了 ${count} 個新推薦！`, 'ai');
       }
       
-      // 重新載入行程以獲取最新的 AI 生成卡片
+      // 清除緩存並重新載入行程以獲取最新的 AI 生成卡片
+      allDaysSlots = {}; // 清除緩存
       await loadItinerary();
+      
+      // 強制重新渲染當前槽位
+      if (currentSlots.length > 0) {
+        renderStackForSlot(currentSlots[0]);
+      }
       
       // 顯示成功訊息
       addMessage('✅ AI 已為您生成全新的香港旅遊卡片！請查看各時段的推薦。', 'ai');
