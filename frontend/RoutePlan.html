@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Google Maps Multi-stop Route</title>
+    <style>
+      html, body { height: 100%; margin: 0; font-family: Arial, sans-serif; }
+      #map { height: 100%; width: 70%; float: left; }
+      #right-panel {
+        height: 100%;
+        width: 30%;
+        float: right;
+        overflow-y: auto;
+        padding: 10px;
+        box-sizing: border-box;
+      }
+      #controls {
+        margin-bottom: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <div id="right-panel">
+      <div id="controls">
+        <label for="mode">Travel mode: </label>
+        <select id="mode">
+          <option value="DRIVING">Driving</option>
+          <option value="WALKING">Walking</option>
+          <option value="BICYCLING">Bicycling</option>
+          <option value="TRANSIT">Transit</option>
+        </select>
+        <button onclick="calculateAndDisplayRoute()">Plan Route</button>
+      </div>
+      <div id="directions-panel"></div>
+    </div>
+
+    <script>
+      let map, directionsService, directionsRenderer;
+
+      // Inline JSON of stops
+      const stops = {
+        "places": [
+          "Victoria Peak, Hong Kong",
+          "Tsim Sha Tsui, Hong Kong",
+          "Mong Kok, Hong Kong",
+          "Hong Kong Disneyland, Hong Kong"
+        ]
+      };
+
+      function initMap() {
+        map = new google.maps.Map(document.getElementById("map"), {
+          zoom: 12,
+          center: { lat: 22.3193, lng: 114.1694 } // center on Hong Kong
+        });
+
+        directionsService = new google.maps.DirectionsService();
+        directionsRenderer = new google.maps.DirectionsRenderer({
+          draggable: true, // user can adjust route
+          map: map,
+          panel: document.getElementById("directions-panel")
+        });
+
+        calculateAndDisplayRoute();
+      }
+
+      function calculateAndDisplayRoute() {
+        const mode = document.getElementById("mode").value;
+        const places = stops.places;
+
+        if (places.length < 2) {
+          alert("Need at least origin and destination.");
+          return;
+        }
+
+        const waypoints = places.slice(1, -1).map(p => ({ location: p, stopover: true }));
+
+        directionsService.route(
+          {
+            origin: places[0],
+            destination: places[places.length - 1],
+            waypoints: waypoints,
+            travelMode: google.maps.TravelMode[mode]
+          },
+          (response, status) => {
+            if (status === "OK") {
+              directionsRenderer.setDirections(response);
+            } else {
+              alert("Directions request failed due to " + status);
+            }
+          }
+        );
+      }
+    </script>
+
+    <!-- Replace YOUR_API_KEY with your real Google Maps API key -->
+    <script async
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA3CBGd2k_u9Ml1x0e-W0VZ7OvakXBwtlw&callback=initMap">
+    </script>
+  </body>
+</html>
