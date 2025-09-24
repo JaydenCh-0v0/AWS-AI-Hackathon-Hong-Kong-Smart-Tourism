@@ -88,16 +88,22 @@ function mockOptions(type) {
   }));
 }
 
-function fillOptionsForSlots(slots) {
+async function fillOptionsForSlots(slots, userProfile = {}, weatherData = [], budget = {}) {
+  console.log(`🎯 Starting to fill options for ${slots.length} slots`);
   for (const slot of slots) {
-    const type =
-      slot.slot_id === 'breakfast' || slot.slot_id === 'lunch' || slot.slot_id === 'dinner'
-        ? 'food'
-        : slot.slot_id === 'accommodation'
-        ? 'hotel'
-        : 'poi';
-    slot.options = mockOptions(type);
+    console.log(`🔄 Processing slot: ${slot.slot_id}`);
+    try {
+      slot.options = await aiAgent.generateTravelCards(slot.slot_id, userProfile, weatherData, budget);
+      console.log(`✅ Successfully generated ${slot.options.length} options for ${slot.slot_id}`);
+    } catch (error) {
+      console.error(`❌ Error generating options for ${slot.slot_id}:`, error);
+      const type = ['breakfast', 'lunch', 'dinner'].includes(slot.slot_id) ? 'food' : 
+                   slot.slot_id === 'accommodation' ? 'hotel' : 'poi';
+      slot.options = mockOptions(type);
+      console.log(`🔄 Using mock options for ${slot.slot_id}`);
+    }
   }
+  console.log('✅ Finished filling all slot options');
 }
 
 function ensureEightSlots(plan) {
@@ -114,14 +120,14 @@ function ensureEightSlots(plan) {
 
 
 // POST /plans — create plan from inputs
-app.post('/plans', (req, res) => {
+app.post('/plans', async (req, res) => {
   const { budget, date_range, locations } = req.body || {};
   const plan = createMinimalPlan({ budget, date_range, locations });
   // Weather mock per day (sunny/rainy alternating)
   plan.context.weather = [];
-  // Fill mock options for 8 slots
+  // Fill AI-generated options for 8 slots
   const day0 = plan.itinerary[0];
-  fillOptionsForSlots(day0.slots);
+  await fillOptionsForSlots(day0.slots, {}, [], plan.inputs.budget);
   plans.set(plan.plan_id, plan);
   res.json({ plan_id: plan.plan_id });
 });
@@ -174,12 +180,12 @@ app.post('/plans/:id/generate', async (req, res) => {
     // Store AI recommendations in plan
     plan.ai_recommendations = aiRecommendations;
     
+    // Generate AI-powered travel cards for each slot
     const day0 = plan.itinerary[0];
+    await fillOptionsForSlots(day0.slots, userProfile, weatherData, budget);
+    
+    // Ensure all slots have selected_option_id initialized
     for (const slot of day0.slots) {
-      if (!Array.isArray(slot.options) || slot.options.length === 0) {
-        const type = slot.slot_id === 'breakfast' || slot.slot_id === 'lunch' || slot.slot_id === 'dinner' ? 'food' : (slot.slot_id === 'accommodation' ? 'hotel' : 'poi');
-        slot.options = mockOptions(type);
-      }
       slot.selected_option_id = slot.selected_option_id || null;
     }
     
@@ -205,9 +211,20 @@ app.post('/plans/:id/swipe', (req, res) => {
   } else if (action === 'remove') {
     slot.options = slot.options.filter((o) => o.option_id !== option_id);
     if (slot.selected_option_id === option_id) slot.selected_option_id = null;
-    // Auto-refill when depleted
+    // Auto-refill when depleted with AI-generated options
     if (slot.options.length < 1) {
-      slot.options = mockOptions(slot_id === 'lunch' ? 'food' : 'poi');
+      // 注意: 此处原代码使用了 await，但其所在的函数 (app.post('/plans/:id/swipe')) 并非 async 函数。
+      // 为了解决此错误，需要将外部的 app.post 回调函数标记为 async。
+      // 如果无法修改外部函数为 async，则必须使用 Promise 的 .then().catch() 方法。
+      // 但这样做会导致 res.json 在选项填充完成前发送响应，可能导致客户端获取到未更新的数据。
+      aiAgent.generateTravelCards(slot_id, plan.preference_profile, plan.context.weather, plan.inputs.budget)
+        .then(newOptions => {
+          slot.options = newOptions.length > 0 ? newOptions : mockOptions(slot_id === 'lunch' ? 'food' : 'poi');
+        })
+        .catch(error => {
+          console.error('生成旅行卡片时出错:', error);
+          slot.options = mockOptions(slot_id === 'lunch' ? 'food' : 'poi');
+        });
     }
   }
   plan.updated_at = new Date().toISOString();

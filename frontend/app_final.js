@@ -231,9 +231,35 @@ async function loadItinerary(){
   if(!currentPlanId) return;
   generateDayTabs();
   
-  // 如果該日期還沒有行程，初始化
-  if (!allDaysSlots[currentDayIndex]) {
-    allDaysSlots[currentDayIndex] = generateDefaultSlots();
+  try {
+    // 從後端獲取最新的行程資料
+    const response = await fetch(`${API}/plans/${currentPlanId}`);
+    if (response.ok) {
+      const plan = await response.json();
+      const backendSlots = plan.itinerary?.[0]?.slots || [];
+      
+      if (backendSlots.length > 0) {
+        // 使用後端的資料
+        allDaysSlots[currentDayIndex] = backendSlots;
+        console.log('✅ Loaded slots from backend:', backendSlots.length);
+      } else {
+        // 如果後端沒有資料，使用預設資料
+        if (!allDaysSlots[currentDayIndex]) {
+          allDaysSlots[currentDayIndex] = generateDefaultSlots();
+        }
+      }
+    } else {
+      // 如果請求失敗，使用預設資料
+      if (!allDaysSlots[currentDayIndex]) {
+        allDaysSlots[currentDayIndex] = generateDefaultSlots();
+      }
+    }
+  } catch (error) {
+    console.error('Error loading itinerary:', error);
+    // 如果發生錯誤，使用預設資料
+    if (!allDaysSlots[currentDayIndex]) {
+      allDaysSlots[currentDayIndex] = generateDefaultSlots();
+    }
   }
   
   currentSlots = allDaysSlots[currentDayIndex];
@@ -271,12 +297,23 @@ function renderStackForSlot(slot){
   if(focusedItem) focusedItem.classList.add('focused');
   
   const options = [...(slot.options||[])].slice(0,3); // 只顯示前三張
+  console.log(`🃏 Rendering ${options.length} cards for slot ${slot.slot_id}:`, options);
+  
   options.forEach((o, idx) => {
     const card = document.createElement('div'); card.className = 'card-item';
     card.style.transform = `translateY(${idx*8}px) scale(${1 - idx*0.04})`;
-    const img = document.createElement('img'); img.src = o.images?.[0] || '';
-    const label = document.createElement('div'); label.className = 'card-label'; label.textContent = `${o.title}  (${o.scores?.popularity||''})`;
-    const intro = document.createElement('div'); intro.className = 'card-intro'; intro.textContent = o.intro || '-';
+    const img = document.createElement('img'); img.src = o.images?.[0] || 'https://picsum.photos/400/240?random=' + Math.floor(Math.random()*1000);
+    
+    // 更好的評分顯示
+    const rating = o.scores?.popularity || o.rating || 4.0;
+    const label = document.createElement('div'); 
+    label.className = 'card-label'; 
+    label.textContent = `${o.title} (${rating})`;
+    
+    const intro = document.createElement('div'); 
+    intro.className = 'card-intro'; 
+    intro.textContent = o.intro || o.description || '精彩推薦，值得一訪';
+    
     const toolbar = document.createElement('div'); toolbar.className = 'card-toolbar';
     const btnAgain = document.createElement('button'); btnAgain.className = 'round-btn again'; btnAgain.textContent = '⟲';
     const btnReject = document.createElement('button'); btnReject.className = 'round-btn reject'; btnReject.textContent = '✕';
@@ -284,11 +321,23 @@ function renderStackForSlot(slot){
     const btnInfo = document.createElement('button'); btnInfo.className = 'round-btn info'; btnInfo.textContent = 'i';
     toolbar.appendChild(btnAgain); toolbar.appendChild(btnReject); toolbar.appendChild(btnAccept); toolbar.appendChild(btnInfo);
 
-    btnAgain.onclick = () => {
-      const seed = Math.floor(Math.random()*10000);
-      slot.options.push({ option_id: `gen-${seed}`, title: o.title + ' (更多)', images: [ (o.images?.[0]||'') + `?r=${seed}` ], intro: o.intro, scores: o.scores });
-      allDaysSlots[currentDayIndex] = currentSlots;
-      renderStackForSlot(slot);
+    btnAgain.onclick = async () => {
+      console.log('🔄 Generating more options for', slot.slot_id);
+      // 請求更多 AI 生成的選項
+      try {
+        const response = await fetch(`${API}/plans/${currentPlanId}/generate`, { method: 'POST' });
+        if (response.ok) {
+          await loadItinerary();
+          renderStackForSlot(slot);
+        }
+      } catch (error) {
+        console.error('Failed to generate more options:', error);
+        // 如果失敗，使用原本的方式
+        const seed = Math.floor(Math.random()*10000);
+        slot.options.push({ option_id: `gen-${seed}`, title: o.title + ' (更多)', images: [ (o.images?.[0]||'') + `?r=${seed}` ], intro: o.intro, scores: o.scores });
+        allDaysSlots[currentDayIndex] = currentSlots;
+        renderStackForSlot(slot);
+      }
     };
     
     btnReject.onclick = () => {
@@ -311,7 +360,19 @@ function renderStackForSlot(slot){
     };
     
     btnInfo.onclick = () => {
-      alert(`${o.title}\\n\\n${o.intro || '（無描述）'}`);
+      let infoText = `${o.title}\n\n${o.intro || '（無描述）'}`;
+      
+      // 如果有詳細資訊，顯示更多內容
+      if (o.details) {
+        if (o.details.address) infoText += `\n\n地址：${o.details.address}`;
+        if (o.details.price_range) infoText += `\n價格：${o.details.price_range}`;
+        if (o.details.opening_hours) infoText += `\n營業時間：${o.details.opening_hours}`;
+        if (o.details.highlights) infoText += `\n\n特色：${o.details.highlights.join('、')}`;
+      }
+      
+      if (o.transit?.hint) infoText += `\n\n交通：${o.transit.hint}`;
+      
+      alert(infoText);
     };
 
     card.appendChild(img); card.appendChild(label); card.appendChild(intro); card.appendChild(toolbar); stack.appendChild(card);
@@ -428,8 +489,11 @@ if(regenBtn){
     regenBtn.disabled = true;
     
     try {
+      console.log('🚀 Starting AI generation...');
       const response = await fetch(API + '/plans/' + currentPlanId + '/generate', { method: 'POST' });
       const data = await response.json();
+      
+      console.log('📥 AI generation response:', data);
       
       // 如果有 AI 推薦，顯示通知
       if (data.ai_recommendations && data.ai_recommendations.recommendations) {
@@ -437,7 +501,11 @@ if(regenBtn){
         addMessage(`🎯 我已根據您的偏好生成了 ${count} 個新推薦！`, 'ai');
       }
       
+      // 重新載入行程以獲取最新的 AI 生成卡片
       await loadItinerary();
+      
+      // 顯示成功訊息
+      addMessage('✅ AI 已為您生成全新的香港旅遊卡片！請查看各時段的推薦。', 'ai');
     } catch (error) {
       console.error('Generation failed:', error);
       alert('AI 生成失敗，請稍後再試');
