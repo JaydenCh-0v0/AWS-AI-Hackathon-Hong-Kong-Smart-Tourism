@@ -320,7 +320,13 @@ function renderStackForSlot(slot){
     
     const intro = document.createElement('div'); 
     intro.className = 'card-intro'; 
-    intro.textContent = o.intro || o.description || '精彩推薦，值得一訪';
+    const fullText = o.intro || o.description || '精彩推薦，值得一訪';
+    const maxLength = 50;
+    if (fullText.length > maxLength) {
+      intro.innerHTML = `${fullText.substring(0, maxLength)}... <span class="view-more" onclick="showInfoModal('${o.option_id}', '${o.title}', '${fullText}', ${JSON.stringify(o.reviews || []).replace(/"/g, '&quot;')}, '${o.photographer || 'Unknown'}', '${o.transit?.hint || ''}')">(查看更多)</span>`;
+    } else {
+      intro.textContent = fullText;
+    }
     
     const toolbar = document.createElement('div'); toolbar.className = 'card-toolbar';
     const btnAgain = document.createElement('button'); btnAgain.className = 'round-btn again'; btnAgain.textContent = '⟲';
@@ -368,22 +374,28 @@ function renderStackForSlot(slot){
     };
     
     btnInfo.onclick = () => {
-      let infoText = `${o.title}\n\n${o.intro || '（無描述）'}`;
-      
-      // 如果有詳細資訊，顯示更多內容
-      if (o.details) {
-        if (o.details.address) infoText += `\n\n地址：${o.details.address}`;
-        if (o.details.price_range) infoText += `\n價格：${o.details.price_range}`;
-        if (o.details.opening_hours) infoText += `\n營業時間：${o.details.opening_hours}`;
-        if (o.details.highlights) infoText += `\n\n特色：${o.details.highlights.join('、')}`;
-      }
-      
-      if (o.transit?.hint) infoText += `\n\n交通：${o.transit.hint}`;
-      
-      alert(infoText);
+      showInfoModal(
+        o.option_id,
+        o.title,
+        fullText,
+        o.reviews || [],
+        o.photographer || 'Unknown',
+        o.transit?.hint || ''
+      );
     };
 
     card.appendChild(img); card.appendChild(label); card.appendChild(intro); card.appendChild(toolbar); stack.appendChild(card);
+    
+    // 儲存卡片資訊供 modal 使用
+    card.dataset.cardInfo = JSON.stringify({
+      id: o.option_id,
+      title: o.title,
+      intro: fullText,
+      reviews: o.reviews || [],
+      photographer: o.photographer || 'Unknown',
+      transit: o.transit?.hint || '',
+      images: o.images || []
+    });
   });
 }
 
@@ -571,12 +583,12 @@ async function updateWeatherInfo(){
   });
   document.getElementById('weatherDate').textContent = dateStr;
   
-  // 檢查日期是否超過 8 天
+  // 檢查日期是否超過 9 天
   if (selectedDate > maxDate) {
     document.getElementById('weatherStatus').textContent = '無法獲取天氣資訊';
     document.getElementById('weatherTemp').textContent = '--';
     document.getElementById('weatherDesc').textContent = '無資料';
-    document.getElementById('adviceContent').textContent = '無法提供超過 8 天的天氣預報';
+    document.getElementById('adviceContent').textContent = '無法提供超過 9 天的天氣預報';
     return;
   }
   
@@ -737,11 +749,52 @@ document.getElementById('qaNext').onclick = async () => {
     qaIndex++;
     renderQA();
   } else {
-    // 完成問卷，顯示所有卡片：P1 + 天氣 + Q&A + 行程
+    // 完成問卷，生成 AI 推薦並顯示行程
+    await generateAIRecommendations();
     updateSectionVisibility(['p1', 'weather', 'qa', 'itinerary']);
     try { await loadItinerary(); } catch {}
   }
 };
+
+async function generateAIRecommendations() {
+  if (!currentPlanId) return;
+  
+  try {
+    console.log('🚀 Generating AI recommendations...');
+    
+    // 更新按鈕狀態
+    const nextBtn = document.getElementById('qaNext');
+    if (nextBtn) {
+      nextBtn.textContent = '🤖 AI 生成中...';
+      nextBtn.disabled = true;
+    }
+    
+    const response = await fetch(`${API}/plans/${currentPlanId}/generate`, { 
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ generate_all: true })
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      console.log('✅ AI recommendations generated:', data);
+      
+      // 清除緩存以獲取最新的 AI 生成卡片
+      allDaysSlots = {};
+      
+      return data;
+    }
+  } catch (error) {
+    console.error('❌ AI generation failed:', error);
+  } finally {
+    // 恢復按鈕狀態
+    const nextBtn = document.getElementById('qaNext');
+    if (nextBtn) {
+      nextBtn.textContent = '🎯 完成並查看行程';
+      nextBtn.disabled = false;
+    }
+  }
+}
 
 // Theme toggle & scroll top
 const root = document.documentElement;

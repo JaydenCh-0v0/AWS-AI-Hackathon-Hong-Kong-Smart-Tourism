@@ -1,8 +1,17 @@
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-dotenv.config();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// 加載 .env 文件（在 backend 目錄下）
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 const POE_API_KEY = process.env.POE_API_KEY;
+console.log('🔑 POE_API_KEY loaded:', POE_API_KEY ? 'YES' : 'NO');
+console.log('🔑 POE_API_KEY value:', POE_API_KEY ? POE_API_KEY.substring(0, 10) + '...' : 'undefined');
+console.log('📁 .env path:', path.resolve(__dirname, '../.env'));
 const POE_API_URL = 'https://api.poe.com/v1/chat/completions';
 const POE_MODEL = 'gpt-3.5-turbo'; // 可改成 deepseek-chat、gpt-4、claude-3-opus 等
 
@@ -121,14 +130,18 @@ class PoeAgent {
       const parsed = JSON.parse(response);
       const options = parsed.options || [];
       
-      // Add real images using Unsplash
+      // Add real images using Unsplash API
       for (const option of options) {
         const keywords = option.search_keywords || option.title;
-        option.images = [
-          `https://source.unsplash.com/400x240/?${encodeURIComponent(keywords)}`,
-          `https://source.unsplash.com/400x240/?hong-kong,${encodeURIComponent(keywords)}`,
-          `https://source.unsplash.com/400x240/?${encodeURIComponent(keywords)},travel`
-        ];
+        try {
+          const imageData = await this.getUnsplashImage(keywords);
+          option.images = [imageData.url];
+          option.photographer = imageData.photographer;
+        } catch (error) {
+          console.error('Failed to get Unsplash image:', error);
+          option.images = [`https://picsum.photos/400/240?random=${Math.random()}`];
+          option.photographer = 'Unknown';
+        }
       }
       
       console.log(`✅ Generated ${options.length} travel cards with real images`);
@@ -175,8 +188,28 @@ class PoeAgent {
     return data.choices?.[0]?.message?.content || JSON.stringify(data);
   }
 
+  async getUnsplashImage(spotName) {
+    const API_KEY = "uBAILJNqyodVFUCyY4nBFOXiB1Y4Zk0_yWikmyhyudk";
+    try {
+      const response = await fetch(`https://api.unsplash.com/search/photos?query=${encodeURIComponent(spotName + ' Hong Kong')}&per_page=1`, {
+        headers: { 'Authorization': `Client-ID ${API_KEY}` }
+      });
+      const data = await response.json();
+      if (data.results && data.results.length > 0) {
+        const photo = data.results[0];
+        return {
+          url: photo.urls.regular,
+          photographer: photo.user.name
+        };
+      }
+    } catch (error) {
+      console.error('Unsplash API error:', error);
+    }
+    return { url: `https://picsum.photos/400/240?random=${Math.random()}`, photographer: 'Unknown' };
+  }
+
   getMockTravelCards(slotType) {
-    const getUnsplashImage = (keywords) => `https://source.unsplash.com/400x240/?${encodeURIComponent(keywords)}`;
+    const getRandomImage = () => `https://picsum.photos/400/240?random=${Math.random()}`;
     
     const cardTemplates = {
       'morning': [
@@ -184,7 +217,7 @@ class PoeAgent {
           option_id: `${slotType}-1`,
           title: '太平山頂',
           intro: '香港最著名的觀景點，俯瞰維多利亞港全景',
-          images: [getUnsplashImage('victoria peak hong kong'), getUnsplashImage('hong kong skyline'), getUnsplashImage('peak tram')],
+          images: [getRandomImage()],
           reviews: [{author: '旅行者A', text: '景色壯觀，必訪景點！'}],
           transit: {hint: '山頂纜車15分鐘'},
           scores: {popularity: 4.8, preference_match: 0.9, weather_fit: 0.8},
@@ -202,7 +235,7 @@ class PoeAgent {
           option_id: `${slotType}-1`,
           title: '添好運點心專門店',
           intro: '世界最便宜米其林一星餐廳，港式點心經典',
-          images: [getUnsplashImage('dim sum hong kong'), getUnsplashImage('chinese food'), getUnsplashImage('tim ho wan')],
+          images: [getRandomImage()],
           reviews: [{author: '美食家B', text: '性價比超高的米其林體驗'}],
           transit: {hint: '地鐵深水埗站5分鐘'},
           scores: {popularity: 4.6, preference_match: 0.8, weather_fit: 1.0},
@@ -220,7 +253,7 @@ class PoeAgent {
           option_id: `${slotType}-1`,
           title: '半島酒店',
           intro: '香港經典奢華酒店，服務一流，位於尖沙咀黃金地段',
-          images: [getUnsplashImage('peninsula hotel hong kong'), getUnsplashImage('luxury hotel'), getUnsplashImage('hong kong hotel')],
+          images: [getRandomImage()],
           reviews: [{author: '商務旅客C', text: '服務無可挑剝，位置絕佳'}],
           transit: {hint: '機場快線45分鐘'},
           scores: {popularity: 4.9, preference_match: 0.9, weather_fit: 1.0},

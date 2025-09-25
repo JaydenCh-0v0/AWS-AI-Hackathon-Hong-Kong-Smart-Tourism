@@ -53,38 +53,63 @@ function createMinimalPlan({ budget, date_range, locations }) {
   };
 }
 
+async function getUnsplashImage(spotName) {
+  const API_KEY = "uBAILJNqyodVFUCyY4nBFOXiB1Y4Zk0_yWikmyhyudk";
+  try {
+    const response = await fetch(`https://api.unsplash.com/search/photos?query=${encodeURIComponent(spotName + ' Hong Kong')}&per_page=1`, {
+      headers: { 'Authorization': `Client-ID ${API_KEY}` }
+    });
+    const data = await response.json();
+    if (data.results && data.results.length > 0) {
+      const photo = data.results[0];
+      return {
+        url: photo.urls.regular,
+        photographer: photo.user.name
+      };
+    }
+  } catch (error) {
+    console.error('Unsplash API error:', error);
+  }
+  return { url: `https://picsum.photos/400/240?random=${Math.random()}`, photographer: 'Unknown' };
+}
+
 function mockOptions(type) {
   const base = {
     poi: [
-      { id: 'poi-1', name: '太平山 Victoria Peak', rating: 4.7, images: ['https://picsum.photos/seed/peak/400/240'] },
-      { id: 'poi-2', name: '星光大道 Avenue of Stars', rating: 4.5, images: ['https://picsum.photos/seed/avenue/400/240'] },
-      { id: 'poi-3', name: '天星小輪 Star Ferry', rating: 4.6, images: ['https://picsum.photos/seed/ferry/400/240'] }
+      { id: 'poi-1', name: '太平山 Victoria Peak', rating: 4.8, intro: '香港最著名的觀景點，俯瞰維多利亞港全景，夜景尤其迷人。山頂纜車是必體驗的交通工具。' },
+      { id: 'poi-2', name: '星光大道 Avenue of Stars', rating: 4.5, intro: '尖沙咀海濱長廊，展示香港電影業發展歷史，可欣賞維港景色和幻彩詠香江燈光秀。' },
+      { id: 'poi-3', name: '天星小輪 Star Ferry', rating: 4.6, intro: '百年歷史的渡輪服務，連接香港島和九龍，是體驗香港海上交通文化的最佳方式。' }
     ],
     food: [
-      { id: 'food-1', name: '添好運 Tim Ho Wan', rating: 4.4, images: ['https://picsum.photos/seed/timhowan/400/240'] },
-      { id: 'food-2', name: '九記牛腩 Kau Kee', rating: 4.5, images: ['https://picsum.photos/seed/kaukee/400/240'] },
-      { id: 'food-3', name: '勝香園 Sing Heung Yuen', rating: 4.6, images: ['https://picsum.photos/seed/singheung/400/240'] }
+      { id: 'food-1', name: '添好運 Tim Ho Wan', rating: 4.4, intro: '世界上最便宜的米其林一星餐廳，以酥皮焗叉燒包聞名，是港式點心的代表。' },
+      { id: 'food-2', name: '九記牛腩 Kau Kee', rating: 4.5, intro: '中環老字號牛腩麵店，湯底清香，牛腩軟嫩，是香港地道美食的經典代表。' },
+      { id: 'food-3', name: '勝香園 Sing Heung Yuen', rating: 4.6, intro: '傳統茶餐廳，以厚多士和奶茶聞名，保持著最純正的香港茶餐廳風味。' }
     ],
     hotel: [
-      { id: 'hotel-1', name: '尖沙咀海景酒店', rating: 4.3, images: ['https://picsum.photos/seed/hotel1/400/240'] },
-      { id: 'hotel-2', name: '中環商旅酒店', rating: 4.2, images: ['https://picsum.photos/seed/hotel2/400/240'] },
-      { id: 'hotel-3', name: '灣仔精品酒店', rating: 4.1, images: ['https://picsum.photos/seed/hotel3/400/240'] }
+      { id: 'hotel-1', name: '尖沙咀海景酒店', rating: 4.3, intro: '位於尖沙咀核心地帶，享有維港海景，交通便利，購物餐飲選擇豐富。' },
+      { id: 'hotel-2', name: '中環商旅酒店', rating: 4.2, intro: '商務型酒店，位於金融中心，適合商務旅客，設施現代化，服務專業。' },
+      { id: 'hotel-3', name: '灣仔精品酒店', rating: 4.1, intro: '精品設計酒店，融合現代與傳統元素，位置便利，近地鐵站和會展中心。' }
     ]
   };
-  return (base[type] || []).map((x) => ({
-    option_id: x.id,
-    title: x.name,
-    intro: '示意資料，僅供 Demo 使用',
-    images: [x.images[0], x.images[0] + '?1', x.images[0] + '?2', x.images[0] + '?3', x.images[0] + '?4'],
-    reviews: [
-      { author: 'Alice', text: '很棒的體驗！' },
-      { author: 'Bob', text: '值得再訪。' },
-      { author: 'Carol', text: '風景很美/食物很讚。' },
-      { author: 'Dave', text: '動線方便。' },
-      { author: 'Eve', text: '排隊稍久，但值得。' }
-    ],
-    transit: { hint: '地鐵/步行 10 分鐘' },
-    scores: { popularity: x.rating, preference_match: 0.7, weather_fit: 0.8 }
+  
+  return Promise.all((base[type] || []).map(async (x) => {
+    const imageData = await getUnsplashImage(x.name);
+    return {
+      option_id: x.id,
+      title: x.name,
+      intro: x.intro,
+      images: [imageData.url],
+      photographer: imageData.photographer,
+      reviews: [
+        { author: 'Alice', text: '很棒的體驗！服務很好，環境舒適。' },
+        { author: 'Bob', text: '值得再訪，性價比很高。' },
+        { author: 'Carol', text: '風景很美，拍照效果很棒。' },
+        { author: 'Dave', text: '交通方便，位置很好找。' },
+        { author: 'Eve', text: '人氣很旺，建議提前預約。' }
+      ],
+      transit: { hint: '地鐵/步行 10 分鐘' },
+      scores: { popularity: x.rating, preference_match: 0.7, weather_fit: 0.8 }
+    };
   }));
 }
 
@@ -99,7 +124,7 @@ async function fillOptionsForSlots(slots, userProfile = {}, weatherData = [], bu
       console.error(`❌ Error generating options for ${slot.slot_id}:`, error);
       const type = ['breakfast', 'lunch', 'dinner'].includes(slot.slot_id) ? 'food' : 
                    slot.slot_id === 'accommodation' ? 'hotel' : 'poi';
-      slot.options = mockOptions(type);
+      slot.options = await mockOptions(type);
       console.log(`🔄 Using mock options for ${slot.slot_id}`);
     }
   }
@@ -125,9 +150,7 @@ app.post('/plans', async (req, res) => {
   const plan = createMinimalPlan({ budget, date_range, locations });
   // Weather mock per day (sunny/rainy alternating)
   plan.context.weather = [];
-  // Fill AI-generated options for 8 slots
-  const day0 = plan.itinerary[0];
-  await fillOptionsForSlots(day0.slots, {}, [], plan.inputs.budget);
+  // Only create empty slots, no AI generation yet
   plans.set(plan.plan_id, plan);
   res.json({ plan_id: plan.plan_id });
 });
@@ -197,7 +220,7 @@ app.post('/plans/:id/generate', async (req, res) => {
 });
 
 // POST /plans/:id/swipe — record swipe and selection
-app.post('/plans/:id/swipe', (req, res) => {
+app.post('/plans/:id/swipe', async (req, res) => {
   const plan = plans.get(req.params.id);
   if (!plan) return res.status(404).json({ error: 'plan not found' });
   const { day_index, slot_id, action, option_id } = req.body || {};
@@ -213,18 +236,15 @@ app.post('/plans/:id/swipe', (req, res) => {
     if (slot.selected_option_id === option_id) slot.selected_option_id = null;
     // Auto-refill when depleted with AI-generated options
     if (slot.options.length < 1) {
-      // 注意: 此处原代码使用了 await，但其所在的函数 (app.post('/plans/:id/swipe')) 并非 async 函数。
-      // 为了解决此错误，需要将外部的 app.post 回调函数标记为 async。
-      // 如果无法修改外部函数为 async，则必须使用 Promise 的 .then().catch() 方法。
-      // 但这样做会导致 res.json 在选项填充完成前发送响应，可能导致客户端获取到未更新的数据。
-      aiAgent.generateTravelCards(slot_id, plan.preference_profile, plan.context.weather, plan.inputs.budget)
-        .then(newOptions => {
-          slot.options = newOptions.length > 0 ? newOptions : mockOptions(slot_id === 'lunch' ? 'food' : 'poi');
-        })
-        .catch(error => {
-          console.error('生成旅行卡片时出错:', error);
-          slot.options = mockOptions(slot_id === 'lunch' ? 'food' : 'poi');
-        });
+      try {
+        const newOptions = await aiAgent.generateTravelCards(slot_id, plan.preference_profile, plan.context.weather, plan.inputs.budget);
+        slot.options = newOptions.length > 0 ? newOptions : mockOptions(slot_id === 'lunch' ? 'food' : 'poi');
+      } catch (error) {
+        console.error('生成旅行卡片時出錯:', error);
+        const type = ['breakfast', 'lunch', 'dinner'].includes(slot_id) ? 'food' : 
+                     slot_id === 'accommodation' ? 'hotel' : 'poi';
+        slot.options = mockOptions(type);
+      }
     }
   }
   plan.updated_at = new Date().toISOString();
