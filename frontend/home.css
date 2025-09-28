@@ -1,0 +1,408 @@
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Kaushan+Script:wght@400&family=Inder:wght@400&display=swap');
+
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inder', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background-color: #f1f3f4;
+    color: #4a5568;
+    line-height: 1.6;
+}
+
+/* Header Styles */
+.header {
+    background-color: #fff;
+    border-bottom: 1px solid #e9ecef;
+    padding: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 2rem;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+}
+
+.logo-image {
+    height: 3rem;
+    width: auto;
+    object-fit: contain;
+}
+
+.nav {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+    padding: 0.5rem 0;
+    transition: color 0.2s ease;
+}
+
+.nav-link:hover {
+    color: #007bff;
+}
+
+.nav-link.active {
+    color: #007bff;
+    font-weight: 600;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.user-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background-color: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: #6c757d;
+    border: 2px solid #e9ecef;
+}
+
+.plan-btn {
+    background-color: #000;
+    color: #fff;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background-color 0.2s ease;
+}
+
+.plan-btn:hover {
+    background-color: #333;
+}
+
+/* Main Content */
+.main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+/* welcome Section */
+.welcome {
+    background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e0 100%);
+    border-radius: 1rem;
+    padding: 3rem;
+    margin-bottom: 3rem;
+    display: flex;
+    align-items: center;
+    min-height: 400px;
+}
+
+.welcome-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: center;
+    width: 100%;
+}
+
+.welcome-text {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.welcome-text {
+    font-family: 'Kaushan Script', cursive;
+    font-size: 3rem;
+    font-weight: 400;
+    color: #4a5568;
+    line-height: 1.2;
+}
+
+.welcome-description {
+    font-size: 1.1rem;
+    color: #718096;
+    line-height: 1.6;
+    max-width: 500px;
+}
+
+.start-plan-btn {
+    background-color: #4a5568;
+    color: #fff;
+    padding: 1rem 2rem;
+    border-radius: 0.75rem;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.1rem;
+    display: inline-block;
+    width: fit-content;
+    transition: background-color 0.2s ease;
+}
+
+.start-plan-btn:hover {
+    background-color: #2d3748;
+}
+
+.welcome-graphic {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.plane-image {
+    max-width: 300px;
+    height: auto;
+    object-fit: contain;
+}
+
+/* Previous Plan Section */
+.previous-plan {
+    margin-top: 3rem;
+}
+
+.section-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #4a5568;
+    margin-bottom: 2rem;
+}
+
+.ticket-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.ticket-frame {
+    width: 100%;
+    max-width: 800px;
+    height: auto;
+    object-fit: contain;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+
+.ticket-content {
+    position: relative;
+    z-index: 2;
+    background: transparent;
+    padding: 2rem;
+    display: grid;
+    grid-template-columns: 1fr auto 2fr;
+    gap: 2rem;
+    align-items: start;
+    width: 100%;
+    max-width: 800px;
+}
+
+.ticket-left {
+    display: flex;
+    flex-direction: column;
+}
+
+.ticket-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.ticket-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.ticket-row .label {
+    font-weight: 600;
+    color: #718096;
+}
+
+.ticket-row .value {
+    color: #4a5568;
+    font-weight: 500;
+}
+
+.ticket-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.dashed-line {
+    width: 2px;
+    height: 200px;
+    background: repeating-linear-gradient(
+        to bottom,
+        #dee2e6 0,
+        #dee2e6 8px,
+        transparent 8px,
+        transparent 16px
+    );
+    position: relative;
+}
+
+.dashed-line::before,
+.dashed-line::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0.5rem;
+    height: 0.5rem;
+    background-color: #dee2e6;
+    border-radius: 50%;
+}
+
+.dashed-line::before {
+    top: -0.25rem;
+}
+
+.dashed-line::after {
+    bottom: -0.25rem;
+}
+
+.ticket-right {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.itinerary {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.day-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.day-header {
+    font-weight: 600;
+    color: #4a5568;
+    font-size: 1rem;
+}
+
+.day-events {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-left: 1rem;
+}
+
+.event {
+    font-size: 0.9rem;
+    color: #718096;
+    line-height: 1.4;
+}
+
+.restaurant-link {
+    color: #4299e1;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.restaurant-link:hover {
+    text-decoration: underline;
+}
+
+.ticket-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: auto;
+}
+
+.details-btn {
+    background-color: #4a5568;
+    color: #fff;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.details-btn:hover {
+    background-color: #2d3748;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .header-content {
+        padding: 1rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .nav {
+        order: 3;
+        width: 100%;
+        justify-content: center;
+        gap: 1rem;
+    }
+    
+    .welcome-content {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+    
+    .welcome-text {
+        font-size: 2rem;
+    }
+    
+    .ticket-content {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .ticket-divider {
+        display: none;
+    }
+    
+    .main {
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .welcome-text {
+        font-size: 1.5rem;
+    }
+    
+    .welcome {
+        padding: 2rem 1rem;
+    }
+    
+    .ticket {
+        padding: 1rem;
+    }
+}

@@ -24,60 +24,28 @@
     </header>
 
     <main>
-      <section class="welcome">
-        <div class="welcome-content">
-            <div class="welcome-text">
-                <h1 class="welcome-text">Welcome back, Ivaney</h1>
-                <p class="welcome-description">
-                    Ready to explore Hong Kong with personalized travel tips and real-time updates? 
-                    Let's start your unforgettable journey now.
-                </p>
-                <a href="weather.html" class="start-plan-btn">Start Plan!</a>
-            </div>
-            <div class="welcoome-graphic">
-                <div class="airplane-graphic">
-                    <img src="image/Plane.png" alt="Airplane" class="plane-image" />
-                    <div class="map-overlay">
-                        <div class="map-markers">
-                            <div class="marker"></div>
-                            <div class="marker"></div>
-                            <div class="marker"></div>
-                            <div class="marker"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-      </section>
 
       <section id="home" class="" data-section="home">
         <div class="hero">
-          <h2>🏙️ 香港智慧旅遊規劃</h2>
+          <h3>Travel Planning Hong Kong</h3>
           <div class="hero-sub">AI 為您量身打造最佳旅遊體驗，從住宿到美食一應俱全</div>
-          <div class="search-bar">
-            <div class="search-grid">
-              <div>
-                <div class="muted">出發地點</div>
-                <input type="text" id="startPlace" placeholder="香港國際機場" />
-              </div>
-              <div>
-                <label for="startDate" class="muted">出發日期</label>
+          <div class="search-grid">
+            <div class="hero-label">
+                <label for="startPlace" style="margin-bottom: 4px;">Depart From</label>
+                <input type="text" id="startPlace" placeholder="Hong Kong International Airport" />
+            </div>
+            <div class="hero-label">
+                <label for="startDate" style="margin-bottom: 4px;">Depart Date</label>
                 <input type="date" id="startDate" />
-              </div>
-              <div>
-                <label for="endDate" class="muted">回程日期</label>
+            </div>
+            <div class="hero-label">
+                <label for="endDate" style="margin-bottom: 4px;">Reture Date</label>
                 <input type="date" id="endDate" />
-              </div>
-              <div>
-                <button id="createPlanBtn" class="btn-primary">🚀 開始規劃</button>
-              </div>
             </div>
-            <div class="quick-locations">
-              <span class="muted">快速選擇：</span>
-              <button type="button" id="btnAirport" class="location-chip">✈️ 機場</button>
-              <button type="button" id="btnWestKowloon" class="location-chip">🚄 西九龍站</button>
+            <div class="hero-button">
+                <button id="createPlanBtn" class="btn-primary">Start Plan</button>
             </div>
-            <div id="planIdWrap" class="hidden plan-info">計劃編號: <span id="planId"></span></div>
+            <div id="planIdWrap" class="hidden plan-info">Plan ID: <span id="planId"></span></div>
           </div>
         </div>
       </section>
@@ -101,7 +69,7 @@
             <div class="advice-content" id="adviceContent">正在分析最佳旅遊建議...</div>
           </div>
         </div>
-      </section>
+    </section>
 
       <section id="qa" class="card qa-card hidden" data-section="qa">
         <h3>🤔 個人化問答</h3>
