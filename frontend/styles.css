@@ -4,7 +4,7 @@
 :root {
   --bg: #ffffff;
   --text: #1a1a1a;
-  --muted: #ffffff;
+  --muted: #000000;
   --card: #ffffff;
   --border: #e5e7eb;
   --primary: #0a7;
@@ -262,12 +262,13 @@ input[type=range]::-moz-range-thumb { width: 16px; height: 16px; border-radius: 
 }
 .weather-header h3 {
   margin: 0 0 8px 0;
-  font-size: 24px;
+  font-size: 36px;
   font-weight: 500;
+  margin-top: 16px;
+  margin-left: 16px;
   font-family: 'Inder', sans-serif !important;
 }
 .weather-info {
-
   background: rgba(255,255,255,0.18);
   border-radius: 16px;
   padding: 24px;
@@ -275,27 +276,22 @@ input[type=range]::-moz-range-thumb { width: 16px; height: 16px; border-radius: 
   width: 500px;
   max-width: 90vw;
   margin-top: 16px;
-  margin-bottom: 25px;
+  margin-bottom: 16px; /* Reduce bottom margin to stack closely with .weather-advice */
   margin-left: 16px;
-  margin-right: 16px;
   display: block;
-  float: right;
-  clear: right;
-  /* The .weather-card background will show behind this */
+  /* Remove float and clear to allow normal document flow */
 }
 
 .weather-advice {
-  background: rgba(192, 192, 192, 0.18);
+  background: rgba(192, 192, 192, 0.3);
   border-radius: 12px;
   padding: 16px;
   width: 500px;
   max-width: 90vw;
-  margin-top: 0; /* Not yet move down */
+  margin-top: 0;
   margin-bottom: 16px;
   margin-left: 16px;
   margin-right: 16px;
-  float: right;
-  clear: right;
   box-shadow: 0 4px 24px rgba(0,0,0,0.08);
 }
 
@@ -304,15 +300,16 @@ input[type=range]::-moz-range-thumb { width: 16px; height: 16px; border-radius: 
   font-size: 16px;
   font-weight: 500;
   margin-bottom: 4px;
+  margin-left: 32px;
   font-family: 'Inder', sans-serif !important;
 }
 .weather-status {
   position: absolute;
-  top: 18px;
-  right: 18px;
+  top: 7px;
+  right: 16px;
   color: #b1afaf;
   opacity: 1;
-  font-size: 12px;
+  font-size: 14px;
   font-family: 'Inder', sans-serif !important;
   margin: 8px 12px 0 0;
 }
@@ -321,6 +318,7 @@ input[type=range]::-moz-range-thumb { width: 16px; height: 16px; border-radius: 
   grid-template-columns: 1fr 2fr;
   gap: 24px;
   margin-top: 20px;
+  margin-right: 32px;
   font-family: 'Inder', sans-serif !important;
 }
 .weather-main {
@@ -352,6 +350,11 @@ input[type=range]::-moz-range-thumb { width: 16px; height: 16px; border-radius: 
   opacity: 0.95;
   line-height: 1.5;
   font-family: 'Inder', sans-serif !important;
+}
+.advice-button {
+  margin-top: 16px;
+  font-family: 'Inder', sans-serif !important;
+  text-align: right;
 }
 
 /* Q&A 卡片樣式 */
@@ -407,10 +410,12 @@ input[type=range]::-moz-range-thumb { width: 16px; height: 16px; border-radius: 
 
 /* 行程卡片樣式 */
 .itinerary-card {
-  background: linear-gradient(135deg, #a29bfe 0%, #6c5ce7 100%);
-  color: #fff;
-  border: none;
-  position: relative;
+  background: #fff;
+  color: #1a1a1a;
+  padding: 48px 24px;
+  border-radius: 20px;
+  border: 5px solid #74ade6;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.05);
   font-family: 'Inder', sans-serif !important;
 }
 .itinerary-card h3 {
@@ -488,11 +493,11 @@ input[type=range]::-moz-range-thumb { width: 16px; height: 16px; border-radius: 
   background: rgba(255,255,255,0.2);
 }
 .slot-list .slot-item.selected { 
-  border-left-color: #fff; 
+  border-left-color: #7a7a7a; 
   background: rgba(255,255,255,0.25);
 }
 .slot-list .slot-item.focused {
-  border: 2px solid #eeeeee;
+  border: 2px solid #7a7a7a;
   font-weight: 600;
 }
 

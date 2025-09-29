@@ -11,10 +11,10 @@
     <header>
       <img src="image/Logo.png" alt="香港行程 Demo" style="height:40px; margin:0;" />
       <nav>
-        <a href="#home">Home</a>
-        <a href="#qa">About Us</a>
+        <a href="index.html">Home</a>
+        <a href="weather.html">Plan</a>
         <a href="#itinerary"> Hong Kong Spots</a>
-        <a href="#overview">Contact Us</a>
+        <a href="Overview.html">Overview</a>
       </nav>
       <div class="toolbar">
         <!--<span class="switch"><input type="checkbox" id="themeToggle" /> 深色模式</span>
@@ -24,26 +24,33 @@
     </header>
 
     <main>
-
       <section id="home" class="" data-section="home">
         <div class="hero">
-          <h3>Travel Planning Hong Kong</h3>
-          <div class="hero-sub">AI 為您量身打造最佳旅遊體驗，從住宿到美食一應俱全</div>
-          <div class="search-grid">
-            <div class="hero-label">
-                <label for="startPlace" style="margin-bottom: 4px;">Depart From</label>
-                <input type="text" id="startPlace" placeholder="Hong Kong International Airport" />
-            </div>
-            <div class="hero-label">
-                <label for="startDate" style="margin-bottom: 4px;">Depart Date</label>
+          <h2>🏙️ Travelling Hong Kong AI Planning</h2>
+          <div class="hero-sub">Authorized custimized best Hong Kong travel experience</div>
+          <div class="search-bar">
+            <div class="search-grid">
+              
+              <div>
+                <div class="hero-label">Depart Location</div>
+                <input type="text" id="startPlace" placeholder="香港國際機場" />
+              </div>
+              <div>
+                <label for="hero-label" class="hero-label">Depart Date</label>
                 <input type="date" id="startDate" />
-            </div>
-            <div class="hero-label">
-                <label for="endDate" style="margin-bottom: 4px;">Reture Date</label>
+              </div>
+              <div>
+                <label for="endDate" class="hero-label">Return Date</label>
                 <input type="date" id="endDate" />
-            </div>
-            <div class="hero-button">
+              </div>
+              <div>
                 <button id="createPlanBtn" class="btn-primary">Start Plan</button>
+              </div>
+            </div>
+            <div class="quick-locations">
+              <span class="hero-label">Quick Choice：</span>
+              <button type="button" id="btnAirport" class="hero-label">✈️ Airport</button>
+              <button type="button" id="btnWestKowloon" class="hero-label">🚄 West Kowloon Statation</button>
             </div>
             <div id="planIdWrap" class="hidden plan-info">Plan ID: <span id="planId"></span></div>
           </div>
@@ -51,50 +58,52 @@
       </section>
 
       <section id="weather" class="card weather-card hidden" data-section="weather">
-        <div class="weather-header">
-          <h3>🌤️ 天氣建議</h3>
-          <div class="weather-date" id="weatherDate"></div>
-          <div class="weather-status" id="weatherStatus">正在獲取天氣資訊...</div>
-        </div>
-
-        <div class="weather-content">
-          <div class="weather-info">
-            <div class="weather-main" id="weatherMain">
-              <div class="weather-temp" id="weatherTemp">--°C</div>
-              <div class="weather-desc" id="weatherDesc">載入中...</div>
+        <div class="weather-content" style="display: flex;">
+          <div class="weather-left" style="flex:2;"></div>
+          <div class="weather-right" style="flex:1;">
+            <div class="weather-info">
+              <div class="weather-header">
+                <h3>🌤️ Weather Suggestion</h3>
+                <div class="weather-date" id="weatherDate"></div>
+                <div class="weather-status" id="weatherStatus">Getting weather infomation ...</div>
+              </div>
+              <div class="weather-main" id="weatherMain">
+                <div class="weather-temp" id="weatherTemp">--°C</div>
+                <div class="weather-desc" id="weatherDesc">Loading...</div>
+              </div>
+            </div>
+            <div class="weather-advice" id="weatherAdvice">
+              <div class="advice-title">💡 Suggestion</div>
+              <div class="advice-content" id="adviceContent">Analyzing Suggestion...</div>
             </div>
           </div>
-          <div class="weather-advice" id="weatherAdvice">
-            <div class="advice-title">💡 旅遊建議</div>
-            <div class="advice-content" id="adviceContent">正在分析最佳旅遊建議...</div>
-          </div>
         </div>
-    </section>
+      </section>
 
       <section id="qa" class="card qa-card hidden" data-section="qa">
-        <h3>🤔 個人化問答</h3>
-        <div class="qa-subtitle">幫助我們了解您的旅遊偏好，為您推薦最合適的行程</div>
+        <h3>Personalized Quiz</h3>
+        <div class="qa-subtitle">This Quiz able to let us know more about your trip preference</div>
         <div id="qaWizard">
           <div class="row" style="justify-content:space-between">
             <div id="qaProgressText">1 / 3</div>
             <div class="qa-progress" style="flex:1; max-width: 300px"><div id="qaProgressBar"></div></div>
           </div>
-          <div id="qaQuestion" style="margin:8px 0">你此行最期待的是？</div>
+          <div id="qaQuestion" style="margin:8px 0">What are you most looking forward to on this trip?</div>
           <div class="grid" id="qaChoices"></div>
           <div id="qaStatus"></div>
           <div style="margin-top:8px">
-            <button id="qaPrev">上一題</button>
-            <button id="qaNext" class="btn-primary">下一題</button>
+            <button id="qaPrev">Previous Question</button>
+            <button id="qaNext" class="btn-primary">Next Qiestion</button>
           </div>
         </div>
       </section>
 
       <section id="itinerary" class="card itinerary-card hidden" data-section="itinerary">
-        <h3>📋 您的專屬行程</h3>
-        <div class="itinerary-subtitle">根據您的偏好量身打造的完美旅程</div>
+        <h3>📋 Your Cutstomize Plan</h3>
+        <div class="itinerary-subtitle">A perfect journey tailored to your preferences.</div>
         <div class="day-tabs" id="dayTabs"></div>
         <div class="row" style="margin-bottom:8px">
-          <button id="regenBtn">重新生成</button>
+          <button id="regenBtn">Regenerate</button>
         </div>
         <div class="slot-container">
           <div class="slot-list" id="slotList"></div>
@@ -109,21 +118,21 @@
         <!-- Chat Room -->
         <div class="chat-room hidden" id="chatRoom">
           <div class="chat-header">
-            <span>🐸 盧氏小樹蛙 🐸</span>
+            <span>🐸 Liui Froggy 🐸</span>
             <button class="chat-close" id="chatClose"><b>✕</b></button>
           </div>
           <div class="chat-messages" id="chatMessages">
             <div class="message ai-message">
               <div class="message-content">
-                你好！我是你的AI旅遊助手 🐸<br>
-                我可以幫你調整行程、推薦景點，或自動完成旅遊規劃。<br>
-                有什麼需要協助的嗎？
+                "Hello! I am your AI travel assistant 🐸<br>
+                  I can help you adjust your itinerary, recommend attractions, or automatically complete travel planning.<br>
+                  Is there anything you need assistance with?"
               </div>
             </div>
           </div>
           <div class="chat-input">
-            <textarea id="chatTextarea" placeholder="輸入你的需求..." rows="2"></textarea>
-            <button id="chatSend" class="btn-primary">發送</button>
+            <textarea id="chatTextarea" placeholder="Entering your needs..." rows="2"></textarea>
+            <button id="chatSend" class="btn-primary">Send</button>
           </div>
         </div>
       </section>

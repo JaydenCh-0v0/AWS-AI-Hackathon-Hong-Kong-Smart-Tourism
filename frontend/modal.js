@@ -13,19 +13,19 @@ function createInfoModal() {
       <div class="modal-body">
         <div class="modal-image">
           <img id="modalImage" src="" alt="">
-          <div class="image-credit">攝影師: <span id="modalPhotographer"></span></div>
+          <div class="image-credit">Photographer: <span id="modalPhotographer"></span></div>
         </div>
         <div class="modal-info">
           <div class="info-section">
-            <h4>📍 詳細介紹</h4>
+            <h4>📍 Discription</h4>
             <p id="modalDescription"></p>
           </div>
           <div class="info-section">
-            <h4>🚇 交通資訊</h4>
+            <h4>🚇 Traffic Information</h4>
             <p id="modalTransit"></p>
           </div>
           <div class="info-section">
-            <h4>💬 用戶評價</h4>
+            <h4>💬 User comment</h4>
             <div id="modalReviews"></div>
           </div>
         </div>
@@ -45,7 +45,7 @@ function showInfoModal(id, title, description, reviews, photographer, transit) {
   document.getElementById('modalTitle').textContent = title;
   document.getElementById('modalDescription').textContent = description;
   document.getElementById('modalPhotographer').textContent = photographer;
-  document.getElementById('modalTransit').textContent = transit || '步行可達';
+  document.getElementById('modalTransit').textContent = transit || 'Within walking distance';
   
   // 設置圖片
   const cardElement = document.querySelector(`[data-card-info*='"id":"${id}"']`);
@@ -71,7 +71,7 @@ function showInfoModal(id, title, description, reviews, photographer, transit) {
       reviewsContainer.appendChild(reviewDiv);
     });
   } else {
-    reviewsContainer.innerHTML = '<p class="no-reviews">暫無評價</p>';
+    reviewsContainer.innerHTML = '<p class="no-reviews">No Comment</p>';
   }
   
   modal.classList.remove('hidden');

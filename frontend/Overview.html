@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HK Trip Demo</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./modal.css" />
+  </head>
+  <body>
+    <header>
+      <img src="image/Logo.png" alt="香港行程 Demo" style="height:40px; margin:0;" />
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="weather.html">Plan</a>
+        <a href="#itinerary"> Hong Kong Spots</a>
+        <a href="Overview.html">Overview</a>
+      </nav>
+      <div class="toolbar">
+        <!--<span class="switch"><input type="checkbox" id="themeToggle" /> 深色模式</span>
+        <button id="scrollTopBtn" title="回頂部">Top</button>-->
+        <button id="startPlanBtn" class="btn-primary">Start Plan</button>
+      </div>
+    </header>
+
+    <main>
+      <section id="overview" class="card" data-section="overview">
+        <h3>Overview & Export</h3>
+        <div id="overviewSummary" class="row" style="gap:6px; flex-wrap:wrap"></div>
+        <pre id="overviewJson" style="white-space:pre-wrap"></pre>
+        <button id="finalizeBtn">Finalize</button>
+        <button id="pdfBtn">Export PDF</button>
+        <button id="icsBtn">Export ICS</button>
+        <div id="pdfLink"></div>
+      </section>
+    </main>
+
+    <script src="./modal.js" defer></script>
+    <script src="./app_final.js" defer></script>
+  </body>
+  </html>
+
+

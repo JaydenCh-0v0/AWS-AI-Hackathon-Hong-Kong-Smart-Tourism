@@ -99,7 +99,7 @@
   bottom: 8px;
   right: 12px;
   background: rgba(0, 0, 0, 0.7);
-  color: white;
+  color: rgb(0, 0, 0);
   padding: 4px 8px;
   border-radius: 4px;
   font-size: 0.8em;
@@ -129,7 +129,7 @@
 .info-section p {
   margin: 0;
   line-height: 1.6;
-  color: #666;
+  color: #aaaaaa;
 }
 
 .review-item {
@@ -188,7 +188,7 @@
 /* Dark mode support */
 .dark .modal-content {
   background: #2d3748;
-  color: #e2e8f0;
+  color: #ffffff;
 }
 
 .dark .modal-header {
@@ -197,7 +197,7 @@
 }
 
 .dark .modal-header h3 {
-  color: #e2e8f0;
+  color: #000000;
 }
 
 .dark .modal-close {
@@ -206,15 +206,15 @@
 
 .dark .modal-close:hover {
   background: #4a5568;
-  color: #e2e8f0;
+  color: #000000;
 }
 
 .dark .info-section h4 {
-  color: #e2e8f0;
+  color: #000000;
 }
 
 .dark .info-section p {
-  color: #a0aec0;
+  color: #8ca8cc;
 }
 
 .dark .review-item {
@@ -222,9 +222,9 @@
 }
 
 .dark .review-author {
-  color: #e2e8f0;
+  color: #000000;
 }
 
 .dark .review-text {
-  color: #a0aec0;
+  color: #000000;
 }

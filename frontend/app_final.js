@@ -8,46 +8,46 @@ let currentSlots = []; // 當前日期的行程
 const qaData = [
   {
     qid: 'q1',
-    text: '你喜歡哪種行程安排？',
+    text: 'What kind of itinerary do you prefer?',
     type: 'choices',
     choices: [
-      { cid: 'q1a1', label: '比起都市更喜歡看風景接觸大自然' },
-      { cid: 'q1a2', label: '逛街購物整天都沒問題' },
-      { cid: 'q1a3', label: '早起玩好玩滿' },
-      { cid: 'q1a4', label: '睡飽想去哪就去哪' }
+      { cid: 'q1a1', label: 'Prefer enjoying natural scenery over urban areas' },
+      { cid: 'q1a2', label: 'Happy to spend all day shopping' },
+      { cid: 'q1a3', label: 'Early riser, want to play and enjoy fully' },
+      { cid: 'q1a4', label: 'Sleep well and go wherever you want' },
     ]
   },
   {
     qid: 'q2',
-    text: '你對於住宿環境要求是如何？',
+    text: 'What are your requirements for accommodation?',
     type: 'choices',
     choices: [
-      { cid: 'q2a1', label: '只要有床有衛浴乾淨就行' },
-      { cid: 'q2a2', label: '喜歡具有當地風格的民宿（可較遠）' },
-      { cid: 'q2a3', label: '不是五星級我可是不住' },
-      { cid: 'q2a4', label: '比較在意飯店/民宿設施' }
+      { cid: 'q2a1', label: 'As long as there is a bed and a clean bathroom, it’s fine' },
+      { cid: 'q2a2', label: 'Prefer local-style guesthouses (can be farther away)' },
+      { cid: 'q2a3', label: 'I won’t stay unless it’s a five-star hotel' },
+      { cid: 'q2a4', label: 'More concerned about hotel/guesthouse facilities' },
     ]
   },
   {
     qid: 'q3',
-    text: '旅遊中你對於食物的要求是如何？',
+    text: 'What are your food preferences during travel?',
     type: 'choices',
     choices: [
-      { cid: 'q3a1', label: '只要路邊看到喜歡就吃' },
-      { cid: 'q3a2', label: '一定要三餐都吃正餐不能餓到' },
-      { cid: 'q3a3', label: '少吃一餐沒關係' },
-      { cid: 'q3a4', label: '只要好吃不管排多人都要吃到 / 再貴都無妨' }
+      { cid: 'q3a1', label: "I'll eat whatever I like on the street" },
+      { cid: 'q3a2', label: "I must have three proper meals and can't go hungry" },
+      { cid: 'q3a3', label: "It's okay to skip a meal" },
+      { cid: 'q3a4', label: "As long as it's delicious, I'll wait in long lines or pay any price" },
     ]
   },
   {
     qid: 'q4',
-    text: '交通工具你會如何選擇？',
+    text: 'How do you choose your transportation during travel?',
     type: 'choices',
     choices: [
-      { cid: 'q4a1', label: '能用走的就走' },
-      { cid: 'q4a2', label: '計程車' },
-      { cid: 'q4a3', label: '巴士/公共汽車' },
-      { cid: 'q4a4', label: '直接包車最舒適' }
+      { cid: 'q4a1', label: 'Walk whenever possible' },
+      { cid: 'q4a2', label: 'Taxi' },
+      { cid: 'q4a3', label: 'Bus/public transportation' },
+      { cid: 'q4a4', label: 'Charter a private car for maximum comfort' },
     ]
   },
   {
@@ -55,15 +55,15 @@ const qaData = [
     text: '哪一種對你來說最放鬆舒壓？',
     type: 'choices',
     choices: [
-      { cid: 'q5a1', label: '人多熱鬧活力充沛' },
-      { cid: 'q5a2', label: '漫步城市中跟自己相處探索自我' },
-      { cid: 'q5a3', label: '什麼都不做待在飯店' },
-      { cid: 'q5a4', label: '探索新的人事物' }
+      { cid: 'q5a1', label: "Being in a lively, bustling crowd full of energy" },
+      { cid: 'q5a2', label: "Strolling through the city, spending time with myself, exploring self" },
+      { cid: 'q5a3', label: "Doing nothing and staying at the hotel" },
+      { cid: 'q5a4', label: "Exploring new people, things, and experiences" },
     ]
   },
   {
     qid: 'q6',
-    text: '你對旅程還有什麼期望？',
+    text: 'Do you have any expectation for this trip?',
     type: 'text'
   }
 ];
@@ -104,12 +104,12 @@ function mock3(type){
       { id: 'food-3', name: '勝香園 Sing Heung Yuen', rating: 4.6, img: 'https://picsum.photos/seed/singheung/400/240' }
     ],
     hotel: [
-      { id: 'hotel-1', name: '尖沙咀海景酒店', rating: 4.3, img: 'https://picsum.photos/seed/hotel1/400/240' },
-      { id: 'hotel-2', name: '中環商旅酒店', rating: 4.2, img: 'https://picsum.photos/seed/hotel2/400/240' },
-      { id: 'hotel-3', name: '灣仔精品酒店', rating: 4.1, img: 'https://picsum.photos/seed/hotel3/400/240' }
+      { id: 'hotel-1', name: '尖沙咀海景酒店 InterContinental Grand Stanford Hong Kong by IHG', rating: 4.3, img: 'https://picsum.photos/seed/hotel1/400/240' },
+      { id: 'hotel-2', name: '香港中環石板街酒店 The Pottinger Hong Kong', rating: 4.2, img: 'https://picsum.photos/seed/hotel2/400/240' },
+      { id: 'hotel-3', name: '灣仔精品酒店 Wifi Boutique Hotel', rating: 4.1, img: 'https://picsum.photos/seed/hotel3/400/240' }
     ]
   };
-  return (pool[type]||[]).map(x=>({ option_id:x.id, title:x.name, images:[x.img], intro:'示意資料，僅供 Demo 使用', scores:{popularity:x.rating} }));
+  return (pool[type]||[]).map(x=>({ option_id:x.id, title:x.name, images:[x.img], intro:'Only for Demo used', scores:{popularity:x.rating} }));
 }
 
 function generateDayTabs() {
@@ -197,7 +197,7 @@ async function createPlan(){
     });
     if(!res.ok){ throw new Error('HTTP ' + res.status); }
     const data = await res.json();
-    if(!data.plan_id){ throw new Error('回傳格式錯誤'); }
+    if(!data.plan_id){ throw new Error('Return Format Error'); }
     setPlanId(data.plan_id);
     
     // 初始化所有日期的行程
@@ -215,12 +215,12 @@ async function createPlan(){
     updateSectionVisibility(['p1', 'weather']);
   } catch (e) {
     console.error(e);
-    alert('建立計畫失敗，請稍後再試：' + (e?.message || e));
+    alert('Fail to build the Plan, Please try later...' + (e?.message || e));
   }
 }
 
 async function answer(q, a){
-  if(!currentPlanId) return alert('請先建立計畫');
+  if(!currentPlanId) return alert('Have planning first');
   await fetch(API + '/plans/' + currentPlanId + '/answers', {
     method: 'POST', headers: {'Content-Type':'application/json'},
     body: JSON.stringify({ question_id: q, selected_choice_id: a })
@@ -320,7 +320,7 @@ function renderStackForSlot(slot){
     
     const intro = document.createElement('div'); 
     intro.className = 'card-intro'; 
-    const fullText = o.intro || o.description || '精彩推薦，值得一訪';
+    const fullText = o.intro || o.description || 'Highly recommended';
     const maxLength = 50;
     if (fullText.length > maxLength) {
       intro.innerHTML = `${fullText.substring(0, maxLength)}... <span class="view-more" onclick="showInfoModal('${o.option_id}', '${o.title}', '${fullText}', ${JSON.stringify(o.reviews || []).replace(/"/g, '&quot;')}, '${o.photographer || 'Unknown'}', '${o.transit?.hint || ''}')">(查看更多)</span>`;
@@ -348,7 +348,7 @@ function renderStackForSlot(slot){
         console.error('Failed to generate more options:', error);
         // 如果失敗，使用原本的方式
         const seed = Math.floor(Math.random()*10000);
-        slot.options.push({ option_id: `gen-${seed}`, title: o.title + ' (更多)', images: [ (o.images?.[0]||'') + `?r=${seed}` ], intro: o.intro, scores: o.scores });
+        slot.options.push({ option_id: `gen-${seed}`, title: o.title + ' (More)', images: [ (o.images?.[0]||'') + `?r=${seed}` ], intro: o.intro, scores: o.scores });
         allDaysSlots[currentDayIndex] = currentSlots;
         renderStackForSlot(slot);
       }
@@ -477,7 +477,7 @@ function setupDateValidation() {
     const endDate = this.value;
     
     if (startDate && endDate && endDate < startDate) {
-      alert('回程日期不能早于出发日期');
+      alert('Return date must be later than depart date');
       this.value = '';
     }
   });
@@ -502,10 +502,10 @@ document.getElementById('icsBtn').onclick = exportIcs;
 const regenBtn = document.getElementById('regenBtn');
 if(regenBtn){
   regenBtn.onclick = async () => {
-    if(!currentPlanId) return alert('請先建立計畫');
+    if(!currentPlanId) return alert('Plan First');
     
     // 顯示載入狀態
-    regenBtn.textContent = '🤖 AI 生成中...';
+    regenBtn.textContent = '🤖 AI generating...';
     regenBtn.disabled = true;
     
     try {
@@ -518,7 +518,7 @@ if(regenBtn){
       // 如果有 AI 推薦，顯示通知
       if (data.ai_recommendations && data.ai_recommendations.recommendations) {
         const count = data.ai_recommendations.recommendations.length;
-        addMessage(`🎯 我已根據您的偏好生成了 ${count} 個新推薦！`, 'ai');
+        addMessage(`🎯 I have generated ${count} new recommendations based on your preferences.`, 'ai');
       }
       
       // 清除緩存並重新載入行程以獲取最新的 AI 生成卡片
@@ -531,12 +531,12 @@ if(regenBtn){
       }
       
       // 顯示成功訊息
-      addMessage('✅ AI 已為您生成全新的香港旅遊卡片！請查看各時段的推薦。', 'ai');
+      addMessage('✅AI has generated brand new Hong Kong travel cards for you! Please check the recommendations for each time period.', 'ai');
     } catch (error) {
       console.error('Generation failed:', error);
-      alert('AI 生成失敗，請稍後再試');
+      alert('AI generation failed, please try again later.');
     } finally {
-      regenBtn.textContent = '重新生成';
+      regenBtn.textContent = 'Regenerate';
       regenBtn.disabled = false;
     }
   };
@@ -585,16 +585,38 @@ async function updateWeatherInfo(){
   
   // 檢查日期是否超過 9 天
   if (selectedDate > maxDate) {
-    document.getElementById('weatherStatus').textContent = '無法獲取天氣資訊';
+    document.getElementById('weatherStatus').textContent = 'Unable to obtain weather information.';
     document.getElementById('weatherTemp').textContent = '--';
-    document.getElementById('weatherDesc').textContent = '無資料';
-    document.getElementById('adviceContent').textContent = '無法提供超過 9 天的天氣預報';
+    document.getElementById('weatherDesc').textContent = 'No information';
+    document.getElementById('adviceContent').textContent = 'Weather forecasts beyond 9 days cannot be provided.';
     return;
   }
   
   try{
     const dateStr = selectedDate.toISOString().slice(0,10);
-    
+    document.getElementById('weatherStatus').textContent = 'Fetching weather information...';
+    document.getElementById('weatherTemp').textContent = '--°C';
+    document.getElementById('weatherDesc').textContent = 'Loading...';
+    document.getElementById('adviceContent').textContent = 'Analyzing best travel advice...';
+
+    const res = await fetch(API + '/weather?date=' + encodeURIComponent(dateStr));
+    if(!res.ok) throw new Error('weather http ' + res.status);
+    const w = await res.json();
+
+    // Update weather information
+    document.getElementById('weatherStatus').textContent = 'Weather information updated';
+    document.getElementById('weatherTemp').textContent = w.temperature || '25°C';
+    document.getElementById('weatherDesc').textContent = w.summary || 'Sunny';
+    document.getElementById('adviceContent').textContent = w.advice || 'Good weather, suitable for outdoor activities and sightseeing';
+    } catch(e){
+    // Use default data
+    document.getElementById('weatherStatus').textContent = 'Using default weather information';
+    document.getElementById('weatherTemp').textContent = '25°C';
+    document.getElementById('weatherDesc').textContent = 'Sunny';
+    document.getElementById('adviceContent').textContent = 'Good weather, suitable for outdoor activities. Recommend carrying sunscreen and wearing lightweight comfortable clothing.';
+  }
+
+    /*
     // 更新狀態
     document.getElementById('weatherStatus').textContent = '正在獲取天氣資訊...';
     document.getElementById('weatherTemp').textContent = '--°C';
@@ -617,6 +639,7 @@ async function updateWeatherInfo(){
     document.getElementById('weatherDesc').textContent = '晴朗';
     document.getElementById('adviceContent').textContent = '天氣良好，適合戶外活動。建議攜帶防曬用品，穿著輕便舒適的服裝。';
   }
+    */
 }
 
 function getSelectedDate() {
@@ -671,22 +694,26 @@ function updateNavigation(activeSection) {
 // 當點擊開始 Q&A 時顯示 QA 卡片
 function startQA() {
   if (!currentPlanId) {
-    alert('請先建立旅遊計畫');
+    alert('Please create a travel plan first.');
     return;
   }
   updateSectionVisibility(['p1', 'weather', 'qa']);
 }
 
-// 添加開始 Q&A 的按鈕到天氣卡片
+// 添加開始 Q&A 的按鈕到天氣卡片，按鈕包裹文字並有右上角框線
 function addQAButton() {
   const weatherCard = document.getElementById('weather');
   if (weatherCard && !weatherCard.querySelector('.start-qa-btn')) {
     const qaButton = document.createElement('button');
-    qaButton.className = 'btn-primary';
-    qaButton.textContent = '🤔 開始個人化問答';
-    qaButton.style.marginTop = '16px';
+    qaButton.className = 'btn-primary start-qa-btn';
+    qaButton.textContent = 'GO to Peronalized Quiz';
+    qaButton.style.marginTop = '24px';
+    qaButton.style.marginBottom = '16px';
+    qaButton.style.marginRight = '16px';
+    qaButton.style.height = '36px';
     qaButton.onclick = startQA;
-    weatherCard.querySelector('.weather-content').appendChild(qaButton);
+    // Append the button to the bottom of the weather card frame with some margin between the frame
+    weatherCard.appendChild(qaButton);
   }
 }
 
@@ -710,8 +737,8 @@ function renderQA(){
         qaAnswers[q.qid] = c.cid;
         const prev = box.querySelector('.choice-selected'); if(prev) prev.classList.remove('choice-selected');
         btn.classList.add('choice-selected');
-        try { await answer(q.qid, c.cid); if(status) status.textContent = '已送出：' + c.label; }
-        catch { if(status) status.textContent = '送出失敗，請重試'; }
+        try { await answer(q.qid, c.cid); if(status) status.textContent = 'Sent：' + c.label; }
+        catch { if(status) status.textContent = 'Send Failure, Please try again'; }
       };
       box.appendChild(btn);
     });
@@ -720,12 +747,12 @@ function renderQA(){
     ta.id = 'qaText';
     ta.rows = 3;
     ta.style.width = '100%';
-    ta.placeholder = '請輸入您的期望（選填）';
+    ta.placeholder = 'Any Other epxectation for this trip? (optional)';
     box.appendChild(ta);
   }
   // 更新下一題按鈕文案（最後一題改為完成）
   const nextBtn = document.getElementById('qaNext');
-  if(nextBtn){ nextBtn.textContent = (qaIndex === qaData.length - 1) ? '🎯 完成並查看行程' : '➡️ 下一題'; }
+  if(nextBtn){ nextBtn.textContent = (qaIndex === qaData.length - 1) ? '🎯 Finish and check the plan' : '➡️ Next Question'; }
 }
 
 document.getElementById('qaPrev').onclick = () => { 
@@ -765,7 +792,7 @@ async function generateAIRecommendations() {
     // 更新按鈕狀態
     const nextBtn = document.getElementById('qaNext');
     if (nextBtn) {
-      nextBtn.textContent = '🤖 AI 生成中...';
+      nextBtn.textContent = '🤖 AI generating...';
       nextBtn.disabled = true;
     }
     
@@ -823,21 +850,21 @@ document.querySelectorAll('nav a').forEach(link => {
       if (currentPlanId) {
         updateSectionVisibility(['p1', 'weather', 'qa']);
       } else {
-        alert('請先建立旅遊計畫');
+        alert('Please create a travel plan first.');
         return;
       }
     } else if (targetSection === 'itinerary') {
       if (currentPlanId) {
         updateSectionVisibility(['p1', 'weather', 'qa', 'itinerary']);
       } else {
-        alert('請先建立旅遊計畫');
+        alert('Please create a travel plan first.');
         return;
       }
     } else if (targetSection === 'overview') {
       if (currentPlanId) {
         updateSectionVisibility(['p1', 'weather', 'qa', 'itinerary', 'overview']);
       } else {
-        alert('請先建立旅遊計畫');
+        alert('Please create a travel plan first.');
         return;
       }
     }
@@ -872,7 +899,7 @@ document.getElementById('chatSend').onclick = async () => {
   textarea.value = '';
   
   // 顯示載入中
-  addMessage('呱呱努力思考中...', 'thinking');
+  addMessage('Froggy Thinking...', 'thinking');
   
   try {
     const response = await sendChatMessage(message);
@@ -886,7 +913,7 @@ document.getElementById('chatSend').onclick = async () => {
     const loadingMsg = document.querySelector('.thinking-message');
     if (loadingMsg) loadingMsg.remove();
     
-    addMessage('抱歉，我現在無法回應，請稍後再試。', 'ai');
+    addMessage('Sorry, I am unable to respond right now, please try again later.', 'ai');
   }
 };
 
@@ -928,7 +955,7 @@ function addMessage(content, type) {
 
 async function sendChatMessage(message) {
   if (!currentPlanId) {
-    return '請先建立旅遊計畫，我才能為您提供個人化建議。';
+    return 'Please create a travel plan first.，I can then provide you with personalized recommendations。';
   }
   
   const response = await fetch(`${API}/plans/${currentPlanId}/chat`, {
