@@ -25,23 +25,23 @@ class PoeAgent {
       return this.getMockRecommendations(budget);
     }
     try {
-      const prompt = `作為香港旅遊專家，根據以下資訊推薦行程：
-用戶偏好：${JSON.stringify(userProfile)}
-天氣：${JSON.stringify(weatherData)}
-預算：${JSON.stringify(budget)}
+      const prompt = `As a Hong Kong travel expert, recommend itinerary based on the following information:
+User preferences: ${JSON.stringify(userProfile)}
+Weather: ${JSON.stringify(weatherData)}
+Budget: ${JSON.stringify(budget)}
 
-請推薦3個適合的景點/餐廳/住宿選項，必須返回有效的JSON格式：
+Please recommend 3 suitable attractions/restaurants/accommodation options, must return valid JSON format:
 {
   "recommendations": [
     {
-      "name": "景點名稱",
-      "reason": "推薦理由",
+      "name": "Attraction Name",
+      "reason": "Recommendation reason",
       "type": "poi/food/hotel",
       "rating": 4.5,
       "price_range": "HKD 100-300",
-      "location": "具體地址",
-      "opening_hours": "營業時間",
-      "highlights": ["特色1", "特色2"]
+      "location": "Specific address",
+      "opening_hours": "Operating hours",
+      "highlights": ["Feature 1", "Feature 2"]
     }
   ]
 }`;
@@ -58,7 +58,7 @@ class PoeAgent {
       return this.getMockChatResponse(message);
     }
     try {
-      const prompt = `你是香港旅遊助手🐸，用繁體中文回答。\n對話歷史：${JSON.stringify(context)}\n用戶問題：${message}\n\n請提供友善、實用的旅遊建議。`;
+      const prompt = `You are a Hong Kong travel assistant 🐸, please answer in English.\nConversation history: ${JSON.stringify(context)}\nUser question: ${message}\n\nPlease provide friendly and practical travel advice.`;
       const response = await this.invokeModel(prompt, false);
       return response;
     } catch (error) {
@@ -80,44 +80,44 @@ class PoeAgent {
     
     try {
       const typeMap = {
-        'breakfast': '早餐餐廳',
-        'lunch': '午餐餐廳', 
-        'dinner': '晚餐餐廳',
-        'morning': '上午景點',
-        'afternoon': '下午景點',
-        'evening': '傍晚景點',
-        'night': '夜間活動',
-        'accommodation': '住宿酒店'
+        'breakfast': 'breakfast restaurants',
+        'lunch': 'lunch restaurants', 
+        'dinner': 'dinner restaurants',
+        'morning': 'morning attractions',
+        'afternoon': 'afternoon attractions',
+        'evening': 'evening attractions',
+        'night': 'night activities',
+        'accommodation': 'accommodation hotels'
       };
       
-      const prompt = `作為香港旅遊專家，為${typeMap[slotType] || '景點'}推薦3個選項。
-用戶偏好：${JSON.stringify(userProfile)}
-天氣：${JSON.stringify(weatherData)}
-預算：${JSON.stringify(budget)}
+      const prompt = `As a Hong Kong travel expert, recommend 3 options for ${typeMap[slotType] || 'attractions'}.
+User preferences: ${JSON.stringify(userProfile)}
+Weather: ${JSON.stringify(weatherData)}
+Budget: ${JSON.stringify(budget)}
 
-請返回標準JSON格式，包含詳細資訊：
+Please return standard JSON format with detailed information:
 {
   "options": [
     {
       "option_id": "unique_id",
-      "title": "地點名稱",
-      "intro": "簡短介紹(50字內)",
-      "search_keywords": "英文搜尋關鍵字",
+      "title": "Location name",
+      "intro": "Brief introduction (within 50 words)",
+      "search_keywords": "English search keywords",
       "reviews": [
-        {"author": "用戶名", "text": "真實評價"}
+        {"author": "Username", "text": "Real review"}
       ],
-      "transit": {"hint": "交通方式"},
+      "transit": {"hint": "Transportation method"},
       "scores": {
         "popularity": 4.5,
         "preference_match": 0.8,
         "weather_fit": 0.9
       },
       "details": {
-        "address": "詳細地址",
-        "price_range": "價格範圍",
-        "opening_hours": "營業時間",
-        "phone": "電話號碼",
-        "highlights": ["特色1", "特色2", "特色3"]
+        "address": "Detailed address",
+        "price_range": "Price range",
+        "opening_hours": "Operating hours",
+        "phone": "Phone number",
+        "highlights": ["Feature 1", "Feature 2", "Feature 3"]
       }
     }
   ]
@@ -155,8 +155,8 @@ class PoeAgent {
 
   async invokeModel(prompt, isJson = false) {
     const systemContent = isJson ? 
-      '你是香港旅遊專家。請嚴格按照要求的JSON格式回答，不要添加任何其他文字。' :
-      '你是香港旅遊助手，請用繁體中文回答。';
+      'You are a Hong Kong travel expert. Please answer strictly in the required JSON format, do not add any other text.' :
+      'You are a Hong Kong travel assistant, please answer in English.';
       
     const messages = [
       { role: 'system', content: systemContent },
@@ -215,18 +215,18 @@ class PoeAgent {
       'morning': [
         {
           option_id: `${slotType}-1`,
-          title: '太平山頂',
-          intro: '香港最著名的觀景點，俯瞰維多利亞港全景',
+          title: 'Victoria Peak',
+          intro: 'Hong Kong\'s most famous viewpoint, overlooking Victoria Harbour',
           images: [getRandomImage()],
-          reviews: [{author: '旅行者A', text: '景色壯觀，必訪景點！'}],
-          transit: {hint: '山頂纜車15分鐘'},
+          reviews: [{author: 'Traveler A', text: 'Spectacular scenery, must-visit attraction!'}],
+          transit: {hint: 'Peak Tram 15 minutes'},
           scores: {popularity: 4.8, preference_match: 0.9, weather_fit: 0.8},
           details: {
-            address: '香港島太平山頂',
+            address: 'Victoria Peak, Hong Kong Island',
             price_range: 'HKD 65-99',
             opening_hours: '07:00-24:00',
             phone: '+852 2849 0668',
-            highlights: ['360度景觀', '山頂纜車', '杜莎夫人蠟像館']
+            highlights: ['360-degree views', 'Peak Tram', 'Madame Tussauds']
           }
         }
       ],
@@ -251,18 +251,18 @@ class PoeAgent {
       'accommodation': [
         {
           option_id: `${slotType}-1`,
-          title: '半島酒店',
-          intro: '香港經典奢華酒店，服務一流，位於尖沙咀黃金地段',
+          title: 'The Peninsula Hotel',
+          intro: 'Hong Kong\'s classic luxury hotel with excellent service in prime Tsim Sha Tsui location',
           images: [getRandomImage()],
-          reviews: [{author: '商務旅客C', text: '服務無可挑剝，位置絕佳'}],
-          transit: {hint: '機場快線45分鐘'},
+          reviews: [{author: 'Business Traveler C', text: 'Impeccable service, excellent location'}],
+          transit: {hint: 'Airport Express 45 minutes'},
           scores: {popularity: 4.9, preference_match: 0.9, weather_fit: 1.0},
           details: {
-            address: '尖沙咀街角',
+            address: 'Salisbury Road, Tsim Sha Tsui',
             price_range: 'HKD 3000-8000',
-            opening_hours: '24小時',
+            opening_hours: '24 hours',
             phone: '+852 2920 2888',
-            highlights: ['奢華服務', '黃金地段', '歷史悠久']
+            highlights: ['Luxury Service', 'Prime Location', 'Historic Heritage']
           }
         }
       ]
@@ -272,25 +272,25 @@ class PoeAgent {
 
   getMockRecommendations(budget) {
     const recommendations = [
-      { name: '太平山頂', reason: '香港必訪景點，360度城市景觀', type: 'poi' },
-      { name: '添好運', reason: '米其林一星茶餐廳，性價比高', type: 'food' },
-      { name: '半島酒店', reason: '經典奢華酒店，服務一流', type: 'hotel' }
+      { name: 'Victoria Peak', reason: 'Must-visit Hong Kong attraction with 360-degree city views', type: 'poi' },
+      { name: 'Tim Ho Wan', reason: 'Michelin one-star dim sum restaurant with great value', type: 'food' },
+      { name: 'Peninsula Hotel', reason: 'Classic luxury hotel with excellent service', type: 'hotel' }
     ];
     return { recommendations };
   }
 
   getMockChatResponse(message) {
     const responses = {
-      '推薦': '我建議你可以在早上安排太平山，下午去星光大道！🏔️',
-      '天氣': '根據天氣預報，建議安排室內活動如購物或博物館參觀。🌧️',
-      '行程': '我可以幫你自動完成今天的行程安排，需要我開始嗎？📋',
-      '景點': '這個景點很棒！我推薦你也可以考慮附近的其他景點。🎯',
-      '交通': '讓我為你優化一下交通路線，這樣會更省時間。🚇'
+      'recommend': 'I suggest you can arrange Victoria Peak in the morning and Avenue of Stars in the afternoon! 🏔️',
+      'weather': 'Based on the weather forecast, I recommend indoor activities like shopping or museum visits. 🌧️',
+      'itinerary': 'I can help you automatically complete today\'s itinerary arrangement. Do you need me to start? 📋',
+      'attraction': 'This attraction is great! I also recommend you consider other nearby attractions. 🎯',
+      'transport': 'Let me optimize the transportation route for you, this will save more time. 🚇'
     };
     for (const [key, response] of Object.entries(responses)) {
-      if (message.includes(key)) return response;
+      if (message.toLowerCase().includes(key)) return response;
     }
-    return '我是你的香港旅遊助手🐸！我可以幫你推薦景點、安排行程、提供交通建議。有什麼想了解的嗎？';
+    return 'I am your Hong Kong travel assistant 🐸! I can help you recommend attractions, arrange itineraries, and provide transportation advice. What would you like to know?';
   }
 }
 
