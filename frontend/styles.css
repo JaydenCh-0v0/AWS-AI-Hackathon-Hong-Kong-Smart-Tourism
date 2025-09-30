@@ -7,8 +7,8 @@
   --muted: #000000;
   --card: #ffffff;
   --border: #e5e7eb;
-  --primary: #0a7;
-  --primary-600: #07805b;
+  --primary: #000;
+  --primary-600: #333;
 }
 .dark {
   --bg: #0b0f14;

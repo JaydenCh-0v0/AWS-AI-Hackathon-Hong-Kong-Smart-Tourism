@@ -266,19 +266,61 @@ Budget: ${JSON.stringify(budget)}`;
   }
 
   getMockPhotoAnalysis(language = 'en', location = null) {
-    const mockData = {
-      en: {
-        title: 'Victoria Peak',
-        description: 'Victoria Peak is Hong Kong\'s most popular tourist attraction, offering breathtaking panoramic views of the city skyline, Victoria Harbour, and surrounding islands. At 552 meters above sea level, it provides the perfect vantage point to appreciate Hong Kong\'s stunning urban landscape.',
-        tags: ['Scenic Views', 'Tourist Attraction', 'Photography', 'Sunset Views', 'City Skyline']
-      },
-      zh: {
-        title: '太平山頂',
-        description: '太平山頂是香港最受歡迎的旅遊景點，可欣賞到令人嘆為觀止的城市天際線、維多利亞港和周圍島嶼的全景。海拔552米的高度為欣賞香港壯麗的都市景觀提供了完美的制高點。',
-        tags: ['風景觀賞', '旅遊景點', '攝影', '日落美景', '城市天際線']
-      }
+    const attractions = {
+      en: [
+        {
+          title: 'Victoria Peak',
+          description: 'Victoria Peak is Hong Kong\'s most popular tourist attraction, offering breathtaking panoramic views of the city skyline, Victoria Harbour, and surrounding islands.',
+          tags: ['Scenic Views', 'Peak Tram', 'Landmark']
+        },
+        {
+          title: 'Star Ferry',
+          description: 'The historic Star Ferry has been crossing Victoria Harbour since 1888, offering an affordable and scenic way to travel between Hong Kong Island and Kowloon.',
+          tags: ['Historic Transport', 'Harbour Views', 'Cultural Heritage']
+        },
+        {
+          title: 'Temple Street Night Market',
+          description: 'A vibrant night market in Yau Ma Tei famous for street food, fortune telling, and bargain shopping. The market comes alive after dark with neon lights and bustling crowds.',
+          tags: ['Night Market', 'Street Food', 'Shopping']
+        },
+        {
+          title: 'Big Buddha (Tian Tan)',
+          description: 'The majestic bronze Buddha statue sits atop Lantau Island, accessible by the scenic Ngong Ping Cable Car. It\'s a symbol of harmony between man and nature.',
+          tags: ['Religious Site', 'Cable Car', 'Mountain Views']
+        },
+        {
+          title: 'Avenue of Stars',
+          description: 'A waterfront promenade celebrating Hong Kong\'s film industry with stunning harbour views. Features handprints of famous stars and the iconic Bruce Lee statue.',
+          tags: ['Cinema History', 'Waterfront', 'Photography']
+        },
+        {
+          title: 'Wong Tai Sin Temple',
+          description: 'A colorful Taoist temple famous for fortune-telling and wish fulfillment. The temple is known for its vibrant architecture and spiritual significance.',
+          tags: ['Taoist Temple', 'Fortune Telling', 'Colorful Architecture']
+        }
+      ],
+      zh: [
+        {
+          title: '太平山頂',
+          description: '太平山頂是香港最受歡迎的旅遊景點，可欣賞到令人嘆為觀止的城市天際線、維多利亞港和周圍島嶼的全景。',
+          tags: ['風景觀賞', '山頂纜車', '地標']
+        },
+        {
+          title: '天星小輪',
+          description: '歷史悠久的天星小輪自1888年起穿梭維多利亞港，為往來香港島和九龍提供經濟實惠的交通方式。',
+          tags: ['歷史交通', '海港景色', '文化遺產']
+        },
+        {
+          title: '廟街夜市',
+          description: '位於油麻地的熱鬧夜市，以街頭小食、算命和平價購物聞名。夜幕降臨後霓虹燈亮起，人潮湧動。',
+          tags: ['夜市', '街頭小食', '購物']
+        }
+      ]
     };
-    return mockData[language] || mockData.en;
+    
+    const attractionList = attractions[language] || attractions.en;
+    const randomAttraction = attractionList[Math.floor(Math.random() * attractionList.length)];
+    return randomAttraction;
   }
 
   async generatePlanOverview(plan) {
