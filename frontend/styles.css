@@ -57,7 +57,9 @@ nav {
   flex: 1;
   font-family: 'Inder', sans-serif !important;
 }
-nav a {
+nav a,
+.toolbar a {
+  margin-left: 12px;
   margin-right: 12px;
   color: var(--text);
   text-decoration: none;
@@ -66,15 +68,26 @@ nav a {
   align-items: center;
   font-family: 'Inder', sans-serif !important;
 }
-nav a:last-child {
+nav a:last-child,
+.toolbar a:last-child {
   margin-right: 0;
 }
-nav a:hover {
+nav a:hover,
+.toolbar a:hover {
   text-decoration: underline;
 }
-nav a.active {
+nav a.active,
+.toolbar a.active {
   color: var(--primary);
   font-weight: 600;
+}
+nav a.current,
+.toolbar a.current {
+  background: var(--primary);
+  color: white;
+  border-radius: 4px;
+  padding: 4px 8px;
+  text-decoration: none;
 }
 .card { 
   background: var(--card); 

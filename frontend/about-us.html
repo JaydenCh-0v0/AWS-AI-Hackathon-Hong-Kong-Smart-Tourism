@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>About Us - HK Trip Demo</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <style>
+      .about-section { padding: 2rem; text-align: center; }
+      .team-container { display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap; margin-top: 2rem; }
+      .team-member { max-width: 200px; }
+      .team-photo { width: 150px; height: 150px; border-radius: 50%; object-fit: cover; }
+      .social-links { margin-top: 1rem; }
+      .social-links a { margin: 0 0.5rem; text-decoration: none; color: #0066cc; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <img src="image/Logo.png" alt="香港行程 Demo" style="height:40px; margin:0;" />
+      <nav>
+        <nav>
+          <a href="index.html">Home</a>
+          <a href="weather.html">Plan</a>
+          <a href="Overview.html">Overview</a>
+          |
+          <a href="photo-guide.html">Photo Guide</a>
+      </nav>
+      <div class="toolbar">
+        <a href="about-us.html" class="current">About Us</a>
+      </div>
+    </header>
+
+    <main>
+      <section class="about-section">
+        <h1>About Our Team</h1>
+        <div class="team-container">
+          <div class="team-member">
+            <img src="image/team-member-1.jpg" alt="Jayden" class="team-photo" />
+            <h3>Jayden Cheung</h3>
+            <p>Full-stack Developer</p>
+            <p>Project Manager</p>
+            <div class="social-links">
+              <a href="https://github.com/JaydenCh-0v0" target="_blank">GitHub</a>
+              <a href="https://www.linkedin.com/in/jayden-cheung-5a0ab7228/" target="_blank">LinkedIn</a>
+            </div>
+          </div>
+          <div class="team-member">
+            <img src="image/team-member-2.jpg" alt="Ivaney" class="team-photo" />
+            <h3>Ivaney Tai</h3>
+            <p>UI/UX Designer</p>
+            <p>Full-stack Developer</p>
+            <div class="social-links">
+              <a href="https://github.com/Ivaney0430" target="_blank">GitHub</a>
+              <a href="https://www.linkedin.com/in/tai-ivaney/" target="_blank">LinkedIn</a>
+            </div>
+          </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

@@ -6,6 +6,13 @@
     <title>Photo Guide - HK Trip</title>
     <link rel="stylesheet" href="./styles.css" />
     <style>
+      nav a.current {
+        background: var(--primary, #007bff);
+        color: white;
+        border-radius: 4px;
+        padding: 4px 8px;
+      }
+      
       .photo-guide-container {
         max-width: 800px;
         margin: 0 auto;
@@ -206,11 +213,12 @@
       <nav>
         <a href="index.html">Home</a>
         <a href="weather.html">Plan</a>
-        <a href="photo-guide.html" class="active">Photo Guide</a>
         <a href="Overview.html">Overview</a>
+        |
+        <a href="photo-guide.html" class="current">Photo Guide</a>
       </nav>
       <div class="toolbar">
-        <button id="backBtn" class="btn-primary">← Back</button>
+        <a href="about-us.html">About Us</a>
       </div>
     </header>
 

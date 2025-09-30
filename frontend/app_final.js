@@ -149,6 +149,10 @@ function generateDayTabs() {
   completeBtn.textContent = '✅ Done';
   completeBtn.onclick = () => {
     updateSectionVisibility(['p1', 'weather', 'qa', 'itinerary', 'overview']);
+    // Update navigation focus from Plan to Overview
+    document.querySelectorAll('nav a').forEach(a => a.classList.remove('current'));
+    const overviewLink = document.querySelector('nav a[href="Overview.html"]');
+    if (overviewLink) overviewLink.classList.add('current');
   };
   dayTabs.appendChild(completeBtn);
 }
@@ -422,11 +426,12 @@ function renderStackForSlot(slot){
       renderStackForSlot(slot);
     };
     
-    btnAccept.onclick = () => {
+    btnAccept.onclick = async () => {
       const target = currentSlots.find(s => s.slot_id === slot.slot_id);
       if(target){ target.selected_option_id = o.option_id; }
       allDaysSlots[currentDayIndex] = currentSlots;
       renderSlotList(currentSlots);
+      await refreshOverview(); // Update overview immediately
       // 自動切換到下一個槽位（如有）
       const all = Array.from(document.querySelectorAll('#slotList .slot-item'));
       const idxLi = all.findIndex(li => li.dataset.slot === slot.slot_id);
@@ -481,9 +486,9 @@ async function refreshOverview(){
   if(sum){
     sum.innerHTML = '';
     // Use current slots data which has the actual selections
-    const slots = allDaysSlots[currentDayIndex] || plan.itinerary?.[0]?.slots || [];
+    const slots = allDaysSlots[currentDayIndex] || currentSlots || [];
     slots.forEach(s => {
-      const sel = s.options.find(o => o.option_id === s.selected_option_id);
+      const sel = s.options?.find(o => o.option_id === s.selected_option_id);
       const badge = document.createElement('span'); 
       badge.className = 'chip';
       if (sel) {
