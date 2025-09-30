@@ -1,0 +1,576 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Photo Guide - HK Trip</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <style>
+      .photo-guide-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      
+      .upload-section {
+        background: var(--card-bg);
+        border-radius: 12px;
+        padding: 24px;
+        margin-bottom: 24px;
+        border: 2px dashed var(--border);
+        text-align: center;
+        transition: all 0.3s ease;
+      }
+      
+      .upload-section:hover {
+        border-color: var(--primary);
+        background: var(--hover-bg);
+      }
+      
+      .upload-section.dragover {
+        border-color: var(--primary);
+        background: var(--primary-light);
+      }
+      
+      .upload-input {
+        display: none;
+      }
+      
+      .upload-button {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        margin: 8px;
+      }
+      
+      .upload-button:hover {
+        background: var(--primary-dark);
+      }
+      
+      .language-switch {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 24px;
+        justify-content: center;
+      }
+      
+      .lang-toggle {
+        position: relative;
+        width: 60px;
+        height: 30px;
+        background: var(--border);
+        border-radius: 15px;
+        cursor: pointer;
+        transition: background 0.3s;
+      }
+      
+      .lang-toggle.active {
+        background: var(--primary);
+      }
+      
+      .lang-toggle::after {
+        content: '';
+        position: absolute;
+        width: 26px;
+        height: 26px;
+        background: white;
+        border-radius: 50%;
+        top: 2px;
+        left: 2px;
+        transition: transform 0.3s;
+      }
+      
+      .lang-toggle.active::after {
+        transform: translateX(30px);
+      }
+      
+      .photo-preview {
+        background: var(--card-bg);
+        border-radius: 12px;
+        padding: 24px;
+        margin-bottom: 24px;
+        display: none;
+      }
+      
+      .photo-preview.show {
+        display: block;
+      }
+      
+      .preview-image {
+        width: 100%;
+        max-width: 400px;
+        height: 300px;
+        object-fit: cover;
+        border-radius: 8px;
+        margin-bottom: 16px;
+      }
+      
+      .guide-content {
+        background: var(--bg);
+        border-radius: 8px;
+        padding: 20px;
+        margin-top: 16px;
+      }
+      
+      .guide-title {
+        font-size: 20px;
+        font-weight: bold;
+        color: var(--primary);
+        margin-bottom: 12px;
+      }
+      
+      .guide-description {
+        line-height: 1.6;
+        color: var(--text);
+        margin-bottom: 16px;
+      }
+      
+      .guide-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 16px;
+      }
+      
+      .tag {
+        background: var(--primary-light);
+        color: var(--primary);
+        padding: 4px 12px;
+        border-radius: 16px;
+        font-size: 14px;
+      }
+      
+      .loading {
+        text-align: center;
+        padding: 40px;
+        color: var(--muted);
+      }
+      
+      .error {
+        background: #fee;
+        color: #c33;
+        padding: 16px;
+        border-radius: 8px;
+        margin: 16px 0;
+      }
+      
+      .analyze-button {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        width: 100%;
+        margin-top: 16px;
+      }
+      
+      .analyze-button:hover {
+        background: var(--primary-dark);
+      }
+      
+      .analyze-button:disabled {
+        background: var(--muted);
+        cursor: not-allowed;
+      }
+      
+      .voice-btn {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 6px 10px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        flex-shrink: 0;
+      }
+      
+      .voice-btn:hover {
+        background: var(--primary-dark);
+      }
+      
+      .voice-btn.speaking {
+        background: #dc3545;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <img src="image/Logo.png" alt="HK Trip" style="height:40px; margin:0;" />
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="weather.html">Plan</a>
+        <a href="photo-guide.html" class="active">Photo Guide</a>
+        <a href="Overview.html">Overview</a>
+      </nav>
+      <div class="toolbar">
+        <button id="backBtn" class="btn-primary">← Back</button>
+      </div>
+    </header>
+
+    <main class="photo-guide-container">
+      <h1>📸 Photo Guide</h1>
+      <p class="muted">Upload a photo of Hong Kong attractions and get AI-powered guide information</p>
+      
+      <div class="language-switch">
+        <span>中文</span>
+        <div class="lang-toggle active" id="langToggle"></div>
+        <span>English</span>
+      </div>
+      
+      <div class="upload-section" id="uploadSection">
+        <div class="upload-content">
+          <h3>📷 Upload Photo</h3>
+          <p class="muted">Drag and drop a photo here, or click to select</p>
+          <div id="locationDisplay" style="display: none; background: var(--success-light, #d4edda); color: var(--success, #155724); padding: 8px 12px; border-radius: 6px; margin: 8px 0; font-size: 14px;"></div>
+          <input type="file" id="photoInput" class="upload-input" accept="image/*" />
+          <button class="upload-button" onclick="document.getElementById('photoInput').click()">
+            Choose Photo
+          </button>
+          <button class="upload-button" id="cameraBtn">📱 Take Photo</button>
+          <button class="upload-button" id="locationBtn">📍 Get Location</button>
+        </div>
+      </div>
+      
+      <div class="photo-preview" id="photoPreview">
+        <img id="previewImage" class="preview-image" alt="Preview" />
+        <button class="analyze-button" id="analyzeBtn">🤖 Analyze Photo</button>
+        
+        <div class="guide-content" id="guideContent" style="display: none;">
+          <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+            <div class="guide-title" id="guideTitle" style="margin: 0; flex: 1;"></div>
+            <button class="voice-btn" id="voiceBtn" title="Read aloud">🔊</button>
+          </div>
+          <div class="guide-description" id="guideDescription"></div>
+          <div class="guide-tags" id="guideTags"></div>
+        </div>
+      </div>
+      
+      <div class="loading" id="loadingState" style="display: none;">
+        <p>🤖 AI is analyzing your photo...</p>
+      </div>
+      
+      <div class="error" id="errorState" style="display: none;"></div>
+    </main>
+
+    <script>
+      let currentLanguage = 'en';
+      let uploadedImage = null;
+      let userLocation = null;
+      let speechSynthesis = window.speechSynthesis;
+      let currentUtterance = null;
+      
+      // Language toggle
+      document.getElementById('langToggle').onclick = () => {
+        const toggle = document.getElementById('langToggle');
+        toggle.classList.toggle('active');
+        currentLanguage = toggle.classList.contains('active') ? 'en' : 'zh';
+        updateLanguage();
+      };
+      
+      // File upload handling
+      const photoInput = document.getElementById('photoInput');
+      const uploadSection = document.getElementById('uploadSection');
+      const photoPreview = document.getElementById('photoPreview');
+      const previewImage = document.getElementById('previewImage');
+      
+      photoInput.onchange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          handleImageUpload(file);
+        }
+      };
+      
+      // Drag and drop
+      uploadSection.ondragover = (e) => {
+        e.preventDefault();
+        uploadSection.classList.add('dragover');
+      };
+      
+      uploadSection.ondragleave = () => {
+        uploadSection.classList.remove('dragover');
+      };
+      
+      uploadSection.ondrop = (e) => {
+        e.preventDefault();
+        uploadSection.classList.remove('dragover');
+        const file = e.dataTransfer.files[0];
+        if (file && file.type.startsWith('image/')) {
+          handleImageUpload(file);
+        }
+      };
+      
+      // Get user location
+      document.getElementById('locationBtn').onclick = async () => {
+        try {
+          const position = await getCurrentPosition();
+          userLocation = {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude
+          };
+          document.getElementById('locationBtn').textContent = '✅ Location Got';
+          document.getElementById('locationBtn').style.background = 'var(--success, #28a745)';
+          
+          // Show location info with place name
+          const locationDisplay = document.getElementById('locationDisplay');
+          locationDisplay.innerHTML = `📍 Getting location name...`;
+          locationDisplay.style.display = 'block';
+          
+          try {
+            const placeName = await getPlaceName(userLocation.latitude, userLocation.longitude);
+            locationDisplay.innerHTML = `📍 Your location: ${placeName}`;
+          } catch (error) {
+            locationDisplay.innerHTML = `📍 Your location: ${userLocation.latitude.toFixed(4)}, ${userLocation.longitude.toFixed(4)}`;
+          }
+        } catch (error) {
+          showError('Unable to get location: ' + error.message);
+        }
+      };
+      
+      async function getPlaceName(lat, lng) {
+        const response = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=en`);
+        const data = await response.json();
+        return data.locality || data.city || data.principalSubdivision || `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+      }
+      
+      function getCurrentPosition() {
+        return new Promise((resolve, reject) => {
+          if (!navigator.geolocation) {
+            reject(new Error('Geolocation not supported'));
+            return;
+          }
+          navigator.geolocation.getCurrentPosition(resolve, reject, {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 300000
+          });
+        });
+      }
+      
+      // Camera capture
+      document.getElementById('cameraBtn').onclick = async () => {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+          const video = document.createElement('video');
+          video.srcObject = stream;
+          video.play();
+          
+          // Simple camera interface (could be enhanced)
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          
+          setTimeout(() => {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            ctx.drawImage(video, 0, 0);
+            
+            canvas.toBlob((blob) => {
+              handleImageUpload(blob);
+              stream.getTracks().forEach(track => track.stop());
+            });
+          }, 3000);
+        } catch (error) {
+          showError('Camera access denied or not available');
+        }
+      };
+      
+      function handleImageUpload(file) {
+        uploadedImage = file;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          previewImage.src = e.target.result;
+          photoPreview.classList.add('show');
+          document.getElementById('guideContent').style.display = 'none';
+        };
+        reader.readAsDataURL(file);
+      }
+      
+      // Analyze photo
+      document.getElementById('analyzeBtn').onclick = async () => {
+        if (!uploadedImage) return;
+        
+        showLoading(true);
+        hideError();
+        
+        try {
+          // Convert image to base64
+          const base64 = await fileToBase64(uploadedImage);
+          
+          // Call AI analysis API
+          const response = await fetch('http://localhost:3001/analyze-photo', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              image: base64,
+              language: currentLanguage,
+              location: userLocation
+            })
+          });
+          
+          if (!response.ok) throw new Error('Analysis failed');
+          
+          const result = await response.json();
+          displayGuideInfo(result);
+          
+        } catch (error) {
+          showError('Failed to analyze photo. Please try again.');
+        } finally {
+          showLoading(false);
+        }
+      };
+      
+      function fileToBase64(file) {
+        return new Promise((resolve, reject) => {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          const img = new Image();
+          
+          img.onload = () => {
+            // Compress image to max 800x600
+            const maxWidth = 800;
+            const maxHeight = 600;
+            let { width, height } = img;
+            
+            if (width > height) {
+              if (width > maxWidth) {
+                height = (height * maxWidth) / width;
+                width = maxWidth;
+              }
+            } else {
+              if (height > maxHeight) {
+                width = (width * maxHeight) / height;
+                height = maxHeight;
+              }
+            }
+            
+            canvas.width = width;
+            canvas.height = height;
+            ctx.drawImage(img, 0, 0, width, height);
+            
+            const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7).split(',')[1];
+            resolve(compressedBase64);
+          };
+          
+          img.onerror = reject;
+          img.src = URL.createObjectURL(file);
+        });
+      }
+      
+      function displayGuideInfo(result) {
+        document.getElementById('guideTitle').textContent = result.title || 'Unknown Location';
+        document.getElementById('guideDescription').textContent = result.description || 'No description available';
+        
+        const tagsContainer = document.getElementById('guideTags');
+        tagsContainer.innerHTML = '';
+        (result.tags || []).forEach(tag => {
+          const tagEl = document.createElement('span');
+          tagEl.className = 'tag';
+          tagEl.textContent = tag;
+          tagsContainer.appendChild(tagEl);
+        });
+        
+        document.getElementById('guideContent').style.display = 'block';
+        
+        // Setup voice button
+        const voiceBtn = document.getElementById('voiceBtn');
+        voiceBtn.onclick = () => toggleSpeech(result);
+      }
+      
+      function toggleSpeech(result) {
+        const voiceBtn = document.getElementById('voiceBtn');
+        
+        if (speechSynthesis.speaking) {
+          speechSynthesis.cancel();
+          voiceBtn.textContent = '🔊';
+          voiceBtn.classList.remove('speaking');
+          return;
+        }
+        
+        const text = `${result.title}. ${result.description}`;
+        currentUtterance = new SpeechSynthesisUtterance(text);
+        currentUtterance.lang = currentLanguage === 'zh' ? 'zh-HK' : 'en-US';
+        currentUtterance.rate = 0.8;
+        
+        currentUtterance.onstart = () => {
+          voiceBtn.textContent = '🔇';
+          voiceBtn.classList.add('speaking');
+        };
+        
+        currentUtterance.onend = () => {
+          voiceBtn.textContent = '🔊';
+          voiceBtn.classList.remove('speaking');
+        };
+        
+        speechSynthesis.speak(currentUtterance);
+      }
+      
+      function showLoading(show) {
+        document.getElementById('loadingState').style.display = show ? 'block' : 'none';
+        document.getElementById('analyzeBtn').disabled = show;
+      }
+      
+      function showError(message) {
+        const errorEl = document.getElementById('errorState');
+        errorEl.textContent = message;
+        errorEl.style.display = 'block';
+      }
+      
+      function hideError() {
+        document.getElementById('errorState').style.display = 'none';
+      }
+      
+      function updateLanguage() {
+        // Update UI text based on language
+        const texts = {
+          en: {
+            title: '📸 Photo Guide',
+            subtitle: 'Upload a photo of Hong Kong attractions and get AI-powered guide information',
+            upload: '📷 Upload Photo',
+            uploadDesc: 'Drag and drop a photo here, or click to select',
+            choose: 'Choose Photo',
+            camera: '📱 Take Photo',
+            location: '📍 Get Location',
+            analyze: '🤖 Analyze View',
+            analyzing: '🤖 AI is analyzing your view...'
+          },
+          zh: {
+            title: '📸 相片導遊',
+            subtitle: '上傳香港景點相片，獲得AI智能導遊介紹',
+            upload: '📷 上傳相片',
+            uploadDesc: '拖放相片到此處，或點擊選擇',
+            choose: '選擇相片',
+            camera: '📱 拍照',
+            location: '📍 獲取位置',
+            analyze: '🤖 分析相片',
+            analyzing: '🤖 AI正在分析您的相片...'
+          }
+        };
+        
+        const t = texts[currentLanguage];
+        document.querySelector('h1').textContent = t.title;
+        document.querySelector('.photo-guide-container p').textContent = t.subtitle;
+        document.querySelector('.upload-content h3').textContent = t.upload;
+        document.querySelector('.upload-content p').textContent = t.uploadDesc;
+        document.querySelector('.upload-button').textContent = t.choose;
+        document.getElementById('cameraBtn').textContent = t.camera;
+        document.getElementById('locationBtn').textContent = t.location;
+        document.getElementById('analyzeBtn').textContent = t.analyze;
+        document.querySelector('.loading p').textContent = t.analyzing;
+      }
+      
+      // Back button
+      document.getElementById('backBtn').onclick = () => {
+        window.history.back();
+      };
+      
+      // Initialize
+      updateLanguage();
+    </script>
+  </body>
+</html>

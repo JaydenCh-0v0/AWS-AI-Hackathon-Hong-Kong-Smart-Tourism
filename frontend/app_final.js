@@ -52,7 +52,7 @@ const qaData = [
   },
   {
     qid: 'q5',
-    text: '哪一種對你來說最放鬆舒壓？',
+    text: 'What is most relaxing and stress-relieving for you?',
     type: 'choices',
     choices: [
       { cid: 'q5a1', label: "Being in a lively, bustling crowd full of energy" },
@@ -146,7 +146,7 @@ function generateDayTabs() {
   // 在右邊添加完成規劃按鈕
   const completeBtn = document.createElement('button');
   completeBtn.className = 'btn-primary complete-btn';
-  completeBtn.textContent = '✅ 完成';
+  completeBtn.textContent = '✅ Done';
   completeBtn.onclick = () => {
     updateSectionVisibility(['p1', 'weather', 'qa', 'itinerary', 'overview']);
   };
@@ -275,7 +275,7 @@ function renderSlotList(slots){
     if(s.selected_option_id){ li.classList.add('selected'); }
     const dot = document.createElement('span'); dot.textContent = '•'; dot.style.color = s.selected_option_id ? 'var(--primary)' : '#999';
     const selectedName = s.options.find(o => o.option_id === s.selected_option_id)?.title || '—';
-    const text = document.createElement('div'); text.style.flex = '1'; text.innerHTML = `<div>${s.label}</div><div class="muted">${s.selected_option_id ? '已選：' + selectedName : '未選'}</div>`;
+    const text = document.createElement('div'); text.style.flex = '1'; text.innerHTML = `<div>${s.label}</div><div class="muted">${s.selected_option_id ? 'Selected：' + selectedName : 'Empty'}</div>`;
     li.appendChild(dot); li.appendChild(text);
     li.onclick = () => {
       document.querySelectorAll('.slot-item').forEach(item => item.classList.remove('focused'));
@@ -323,9 +323,43 @@ function renderStackForSlot(slot){
     const fullText = o.intro || o.description || 'Highly recommended';
     const maxLength = 50;
     if (fullText.length > maxLength) {
-      intro.innerHTML = `${fullText.substring(0, maxLength)}... <span class="view-more" onclick="showInfoModal('${o.option_id}', '${o.title}', '${fullText}', ${JSON.stringify(o.reviews || []).replace(/"/g, '&quot;')}, '${o.photographer || 'Unknown'}', '${o.transit?.hint || ''}')">(查看更多)</span>`;
+      intro.innerHTML = `${fullText.substring(0, maxLength)}... <span class="view-more" onclick="showInfoModal('${o.option_id}', '${o.title}', '${fullText}', ${JSON.stringify(o.reviews || []).replace(/"/g, '&quot;')}, '${o.photographer || 'Unknown'}', '${o.transit?.hint || ''}')"> (More Info) </span>`;
     } else {
       intro.textContent = fullText;
+    }
+    
+    // Add traffic information
+    if (o.traffic) {
+      const trafficDiv = document.createElement('div');
+      trafficDiv.className = 'card-traffic';
+      trafficDiv.style.fontSize = '12px';
+      trafficDiv.style.color = '#666';
+      trafficDiv.style.marginTop = '8px';
+      trafficDiv.textContent = o.traffic;
+      intro.appendChild(trafficDiv);
+    }
+    
+    // Add user comment
+    if (o.userComment) {
+      const commentDiv = document.createElement('div');
+      commentDiv.className = 'card-comment';
+      commentDiv.style.fontSize = '12px';
+      commentDiv.style.color = '#0a7';
+      commentDiv.style.marginTop = '6px';
+      commentDiv.style.fontStyle = 'italic';
+      commentDiv.textContent = o.userComment;
+      intro.appendChild(commentDiv);
+    }
+    
+    // Add booking links
+    if (slot.slot_id === 'breakfast' || slot.slot_id === 'lunch' || slot.slot_id === 'dinner') {
+      const bookingLink = document.createElement('div');
+      bookingLink.innerHTML = `<a href="https://www.openrice.com/en/hongkong/restaurants?whatwhere=${encodeURIComponent(o.title)}&tabIndex=0" target="_blank" style="color: var(--primary); text-decoration: none; font-size: 12px;">📍 Book on OpenRice</a>`;
+      intro.appendChild(bookingLink);
+    } else if (slot.slot_id === 'accommodation') {
+      const bookingLink = document.createElement('div');
+      bookingLink.innerHTML = `<a href="https://www.hotels.com/search.do?q-destination=${encodeURIComponent('Hong Kong')}&q-check-in=${document.getElementById('startDate').value}&q-check-out=${document.getElementById('endDate').value}&q-rooms=1" target="_blank" style="color: var(--primary); text-decoration: none; font-size: 12px;">🏨 Book on Hotels.com</a>`;
+      intro.appendChild(bookingLink);
     }
     
     const toolbar = document.createElement('div'); toolbar.className = 'card-toolbar';
@@ -333,6 +367,32 @@ function renderStackForSlot(slot){
     const btnReject = document.createElement('button'); btnReject.className = 'round-btn reject'; btnReject.textContent = '✕';
     const btnAccept = document.createElement('button'); btnAccept.className = 'round-btn accept'; btnAccept.textContent = '✓';
     const btnInfo = document.createElement('button'); btnInfo.className = 'round-btn info'; btnInfo.textContent = 'i';
+    
+    // Add booking buttons
+    if (slot.slot_id === 'breakfast' || slot.slot_id === 'lunch' || slot.slot_id === 'dinner') {
+      const btnBook = document.createElement('button'); 
+      btnBook.className = 'round-btn book'; 
+      btnBook.textContent = '📍';
+      btnBook.title = 'Book on OpenRice';
+      btnBook.onclick = (e) => {
+        e.stopPropagation();
+        window.open(`https://www.openrice.com/en/hongkong/restaurants?whatwhere=${encodeURIComponent(o.title)}&tabIndex=0`, '_blank');
+      };
+      toolbar.appendChild(btnBook);
+    } else if (slot.slot_id === 'accommodation') {
+      const btnBook = document.createElement('button'); 
+      btnBook.className = 'round-btn hotel'; 
+      btnBook.textContent = '🏨';
+      btnBook.title = 'Book on Hotels.com';
+      btnBook.onclick = (e) => {
+        e.stopPropagation();
+        const checkIn = document.getElementById('startDate').value;
+        const checkOut = document.getElementById('endDate').value;
+        window.open(`https://www.hotels.com/search.do?q-destination=${encodeURIComponent('Hong Kong')}&q-check-in=${checkIn}&q-check-out=${checkOut}&q-rooms=1`, '_blank');
+      };
+      toolbar.appendChild(btnBook);
+    }
+    
     toolbar.appendChild(btnAgain); toolbar.appendChild(btnReject); toolbar.appendChild(btnAccept); toolbar.appendChild(btnInfo);
 
     btnAgain.onclick = async () => {
@@ -413,15 +473,171 @@ async function refreshOverview(){
   if(!currentPlanId) return;
   const plan = await (await fetch(API + '/plans/' + currentPlanId)).json();
   document.getElementById('overviewJson').textContent = JSON.stringify(plan, null, 2);
+  
+  // Generate AI overview
+  await generateAIOverview(plan);
+  
   const sum = document.getElementById('overviewSummary');
   if(sum){
     sum.innerHTML = '';
-    const slots = plan.itinerary?.[0]?.slots || [];
+    // Use current slots data which has the actual selections
+    const slots = allDaysSlots[currentDayIndex] || plan.itinerary?.[0]?.slots || [];
     slots.forEach(s => {
       const sel = s.options.find(o => o.option_id === s.selected_option_id);
-      const badge = document.createElement('span'); badge.className = 'chip'; badge.textContent = sel ? `${s.slot_id}: ${sel.title}` : `${s.slot_id}: 未選`;
+      const badge = document.createElement('span'); 
+      badge.className = 'chip';
+      if (sel) {
+        badge.textContent = `${s.slot_id}: ${sel.title}`;
+        badge.style.background = '#0a7';
+        badge.style.color = 'white';
+      } else {
+        badge.textContent = `${s.slot_id}: Not Selected`;
+        badge.style.background = '#ccc';
+        badge.style.color = '#666';
+      }
       sum.appendChild(badge);
     });
+  }
+}
+
+async function generateAIOverview(plan) {
+  const overviewText = document.getElementById('aiOverviewText');
+  const voiceBtn = document.getElementById('voiceOverviewBtn');
+  
+  if (!overviewText) return;
+  
+  try {
+    overviewText.textContent = 'AI analyzing your travel plan...';
+    
+    // Send current slots data for more accurate analysis
+    const currentSlotsData = allDaysSlots[currentDayIndex] || currentSlots || [];
+    
+    const response = await fetch(`${API}/plans/${currentPlanId}/overview`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ currentSlots: currentSlotsData })
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      overviewText.textContent = data.overview || 'Your Hong Kong travel plan looks great! Based on the weather forecast, I recommend bringing comfortable walking shoes and light clothing.';
+    } else {
+      // Fallback with current slots data
+      const selectedCount = currentSlotsData.filter(s => s.selected_option_id).length;
+      if (selectedCount > 0) {
+        const selectedNames = currentSlotsData
+          .filter(s => s.selected_option_id)
+          .map(s => s.options.find(o => o.option_id === s.selected_option_id)?.title)
+          .filter(Boolean)
+          .slice(0, 3)
+          .join(', ');
+        overviewText.textContent = `Great Hong Kong itinerary! 🎆 You've selected ${selectedCount} activities including ${selectedNames}${selectedCount > 3 ? ' and more' : ''}. Your plan offers a wonderful mix of Hong Kong's culture, cuisine, and attractions. Remember to wear comfortable shoes and enjoy the journey!`;
+      } else {
+        overviewText.textContent = 'Welcome to your Hong Kong adventure! 🇭🇰 Start selecting your preferred activities to create your personalized itinerary.';
+      }
+    }
+  } catch (error) {
+    // Fallback with current slots data
+    const currentSlotsData = allDaysSlots[currentDayIndex] || currentSlots || [];
+    const selectedCount = currentSlotsData.filter(s => s.selected_option_id).length;
+    if (selectedCount > 0) {
+      overviewText.textContent = `Your Hong Kong travel plan is taking shape! 🎆 You've selected ${selectedCount} activities. Based on the weather forecast, your itinerary looks great for exploring Hong Kong's best attractions, dining, and culture.`;
+    } else {
+      overviewText.textContent = 'Welcome to your Hong Kong adventure! 🇭🇰 Start selecting your preferred activities to create your personalized itinerary.';
+    }
+  }
+  
+  // Enable voice button
+  if (voiceBtn) {
+    voiceBtn.disabled = false;
+    voiceBtn.onclick = () => speakText(overviewText.textContent);
+  }
+}
+
+function speakText(text) {
+  if ('speechSynthesis' in window) {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'en-US';
+    utterance.rate = 0.9;
+    speechSynthesis.speak(utterance);
+  }
+}
+
+function exportToGoogleMaps() {
+  if (!currentPlanId) return;
+  
+  const slots = allDaysSlots[currentDayIndex] || currentSlots || [];
+  const waypoints = [];
+  
+  slots.forEach(slot => {
+    const selected = slot.options.find(o => o.option_id === slot.selected_option_id);
+    if (selected && (slot.slot_id === 'morning' || slot.slot_id === 'afternoon' || slot.slot_id === 'evening' || slot.slot_id === 'night')) {
+      waypoints.push(encodeURIComponent(selected.title + ' Hong Kong'));
+    }
+  });
+  
+  if (waypoints.length > 0) {
+    const url = `https://www.google.com/maps/dir/${waypoints.join('/')}`;
+    window.open(url, '_blank');
+  } else {
+    alert('Please select some attractions first!');
+  }
+}
+
+function exportToGoogleCalendar() {
+  if (!currentPlanId) return;
+  
+  const startDate = document.getElementById('startDate').value;
+  if (!startDate) return;
+  
+  const slots = allDaysSlots[currentDayIndex] || currentSlots || [];
+  const events = [];
+  
+  slots.forEach(slot => {
+    const selected = slot.options.find(o => o.option_id === slot.selected_option_id);
+    if (selected) {
+      const timeMap = {
+        'breakfast': '0800',
+        'morning': '0900',
+        'lunch': '1200',
+        'afternoon': '1330',
+        'evening': '1530',
+        'dinner': '1830',
+        'night': '2000',
+        'accommodation': '2200'
+      };
+      
+      const endTimeMap = {
+        'breakfast': '0900',
+        'morning': '1200',
+        'lunch': '1330',
+        'afternoon': '1530',
+        'evening': '1830',
+        'dinner': '2000',
+        'night': '2200',
+        'accommodation': '0800'
+      };
+      
+      const startTime = timeMap[slot.slot_id] || '0900';
+      const endTime = endTimeMap[slot.slot_id] || '1000';
+      const eventDate = startDate.replace(/-/g, '');
+      const nextDay = slot.slot_id === 'accommodation' ? 
+        (parseInt(eventDate) + 1).toString() : eventDate;
+      
+      const title = encodeURIComponent(`${selected.title}`);
+      const details = encodeURIComponent(`${slot.label}\n\n${selected.intro || ''}\n\nTraffic: ${selected.traffic || 'MTR access'}`);
+      
+      const calendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${eventDate}T${startTime}00/${nextDay}T${endTime}00&details=${details}&location=${encodeURIComponent(selected.title + ', Hong Kong')}`;
+      events.push(calendarUrl);
+    }
+  });
+  
+  if (events.length > 0) {
+    events.forEach((url, index) => {
+      setTimeout(() => window.open(url, '_blank'), index * 500);
+    });
+  } else {
+    alert('Please select your itinerary items first!');
   }
 }
 
@@ -732,6 +948,7 @@ function renderQA(){
   if(q.type === 'choices'){
     (q.choices || []).forEach(c => {
       const btn = document.createElement('button');
+      btn.className = 'qa-choice-btn';
       btn.textContent = c.label;
       btn.onclick = async () => {
         qaAnswers[q.qid] = c.cid;
@@ -817,7 +1034,7 @@ async function generateAIRecommendations() {
     // 恢復按鈕狀態
     const nextBtn = document.getElementById('qaNext');
     if (nextBtn) {
-      nextBtn.textContent = '🎯 完成並查看行程';
+      nextBtn.textContent = 'Complete and review your trip';
       nextBtn.disabled = false;
     }
   }
@@ -926,24 +1143,10 @@ function addMessage(content, type) {
   contentDiv.className = 'message-content';
   
   if (type === 'ai') {
-    // AI 訊息使用打字機效果
-    messageDiv.classList.add('typing');
-    contentDiv.textContent = '';
+    // AI 訊息直接顯示，不使用打字機效果
+    contentDiv.innerHTML = content;
     messageDiv.appendChild(contentDiv);
     messagesContainer.appendChild(messageDiv);
-    
-    // 逐字顯示
-    let i = 0;
-    const typeWriter = () => {
-      if (i < content.length) {
-        contentDiv.textContent += content.charAt(i);
-        i++;
-        setTimeout(typeWriter, 50);
-      } else {
-        messageDiv.classList.remove('typing');
-      }
-    };
-    typeWriter();
   } else {
     contentDiv.textContent = content;
     messageDiv.appendChild(contentDiv);
@@ -958,6 +1161,11 @@ async function sendChatMessage(message) {
     return 'Please create a travel plan first.，I can then provide you with personalized recommendations。';
   }
   
+  // Check for complete travel planning request
+  if (message.toLowerCase().includes('complete') && (message.toLowerCase().includes('plan') || message.toLowerCase().includes('travel') || message.toLowerCase().includes('itinerary'))) {
+    return await autoCompleteTravelPlan();
+  }
+  
   const response = await fetch(`${API}/plans/${currentPlanId}/chat`, {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
@@ -970,6 +1178,47 @@ async function sendChatMessage(message) {
   
   const data = await response.json();
   return data.response;
+}
+
+async function autoCompleteTravelPlan() {
+  if (!currentPlanId) return 'Please create a travel plan first.';
+  
+  try {
+    const slots = allDaysSlots[currentDayIndex] || currentSlots || [];
+    let completedCount = 0;
+    
+    // Auto-select first option for empty slots
+    slots.forEach(slot => {
+      if (!slot.selected_option_id && slot.options && slot.options.length > 0) {
+        slot.selected_option_id = slot.options[0].option_id;
+        completedCount++;
+      }
+    });
+    
+    // Update the slots data
+    allDaysSlots[currentDayIndex] = slots;
+    currentSlots = slots;
+    
+    // Refresh the UI
+    renderSlotList(currentSlots);
+    await refreshOverview();
+    
+    if (completedCount > 0) {
+      return `🎆 Perfect! I've completed your Hong Kong travel plan by selecting ${completedCount} activities for you! Your itinerary now includes:\n\n${slots.filter(s => s.selected_option_id).map(s => {
+        const selected = s.options.find(o => o.option_id === s.selected_option_id);
+        return `• ${s.slot_id}: ${selected?.title || 'Selected'}`;
+      }).join('\n')}\n\n🌟 Your complete Hong Kong adventure is ready! Check the overview section for export options to Google Maps and Calendar. Have an amazing trip! 🇭🇰`;
+    } else {
+      const selectedItems = slots.filter(s => s.selected_option_id);
+      return `🎉 Great news! Your Hong Kong travel plan is already complete with ${selectedItems.length} selected activities:\n\n${selectedItems.map(s => {
+        const selected = s.options.find(o => o.option_id === s.selected_option_id);
+        return `• ${s.slot_id}: ${selected?.title || 'Selected'}`;
+      }).join('\n')}\n\n🗺️ You can now export your plan to Google Maps and Google Calendar from the overview section. Enjoy your Hong Kong adventure! 🇭🇰`;
+    }
+  } catch (error) {
+    console.error('Auto-complete error:', error);
+    return '🤖 I encountered an issue while completing your plan. Please try selecting your preferences manually, and I\'ll be happy to help with any questions!';
+  }
 }
 
 // Enter key support

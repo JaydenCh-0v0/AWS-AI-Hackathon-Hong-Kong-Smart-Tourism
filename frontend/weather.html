@@ -33,7 +33,7 @@
               
               <div>
                 <div class="hero-label">Depart Location</div>
-                <input type="text" id="startPlace" placeholder="香港國際機場" />
+                <input type="text" id="startPlace" placeholder="Hong Kong Airport" />
               </div>
               <div>
                 <label for="hero-label" class="hero-label">Depart Date</label>
@@ -138,13 +138,42 @@
       </section>
 
       <section id="overview" class="card" data-section="overview">
-        <h3>Overview & Export</h3>
-        <div id="overviewSummary" class="row" style="gap:6px; flex-wrap:wrap"></div>
-        <pre id="overviewJson" style="white-space:pre-wrap"></pre>
-        <button id="finalizeBtn">Finalize</button>
-        <button id="pdfBtn">Export PDF</button>
-        <button id="icsBtn">Export ICS</button>
-        <div id="pdfLink"></div>
+        <h3>🎯 Travel Plan Overview</h3>
+        
+        <!-- AI Overview Section -->
+        <div class="ai-overview-section" style="margin-bottom: 24px; padding: 16px; background: #f8f9fa; border-radius: 8px;">
+          <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+            <h4 style="margin: 0;">🤖 AI Travel Analysis</h4>
+            <button id="voiceOverviewBtn" class="round-btn" title="Listen to overview" disabled style="background: #0a7; color: white;">🔊</button>
+          </div>
+          <div id="aiOverviewText" style="line-height: 1.6; color: #333;">Generating AI analysis of your travel plan...</div>
+        </div>
+        
+        <!-- Selected Items Summary -->
+        <div style="margin-bottom: 20px;">
+          <h4>📋 Your Selected Items</h4>
+          <div id="overviewSummary" class="row" style="gap:6px; flex-wrap:wrap"></div>
+        </div>
+        
+        <!-- Export Buttons -->
+        <div style="margin-bottom: 20px;">
+          <h4>📤 Export Your Plan</h4>
+          <div class="export-buttons" style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <button id="googleMapsBtn" class="btn-primary" onclick="exportToGoogleMaps()" style="background: #4285f4;">🗺️ Open in Google Maps</button>
+            <button id="googleCalendarBtn" class="btn-primary" onclick="exportToGoogleCalendar()" style="background: #34a853;">📅 Add to Google Calendar</button>
+            <button id="pdfBtn">📄 Export PDF</button>
+            <button id="icsBtn">📅 Export ICS</button>
+          </div>
+          <div id="pdfLink" style="margin-top: 8px;"></div>
+        </div>
+        
+        <!-- Plan Details (Collapsible) -->
+        <details style="margin-top: 20px;">
+          <summary style="cursor: pointer; font-weight: bold; margin-bottom: 12px;">🔍 View Plan Details (JSON)</summary>
+          <pre id="overviewJson" style="white-space:pre-wrap; background: #f5f5f5; padding: 12px; border-radius: 4px; font-size: 12px; max-height: 300px; overflow-y: auto;"></pre>
+        </details>
+        
+        <button id="finalizeBtn" style="margin-top: 16px;">✅ Finalize Plan</button>
       </section>
     </main>
 

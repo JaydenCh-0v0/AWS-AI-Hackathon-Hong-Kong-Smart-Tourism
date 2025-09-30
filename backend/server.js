@@ -9,7 +9,8 @@ import aiAgent from './services/agent.js';
 
 const app = express();
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // In-memory store for demo
 const plans = new Map();
@@ -326,11 +327,44 @@ app.post('/plans/:id/chat', async (req, res) => {
   }
 });
 
+// POST /analyze-photo — Photo guide analysis
+app.post('/analyze-photo', async (req, res) => {
+  const { image, language = 'en', location } = req.body || {};
+  if (!image) return res.status(400).json({ error: 'image required' });
+  
+  try {
+    const result = await aiAgent.analyzePhoto(image, language, location);
+    res.json(result);
+  } catch (error) {
+    console.error('Photo analysis error:', error);
+    res.status(500).json({ error: 'analysis failed' });
+  }
+});
+
+// POST /plans/:id/overview — Generate AI plan overview
+app.post('/plans/:id/overview', async (req, res) => {
+  const plan = plans.get(req.params.id);
+  if (!plan) return res.status(404).json({ error: 'plan not found' });
+  
+  try {
+    const overview = await aiAgent.generatePlanOverview(plan);
+    res.json({ overview });
+  } catch (error) {
+    console.error('Overview generation error:', error);
+    res.json({ overview: 'Your Hong Kong travel plan looks great! Based on the weather forecast, I recommend bringing comfortable walking shoes and light clothing.' });
+  }
+});
+
 // Serve static frontend for demo
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const frontendDir = path.resolve(__dirname, '../frontend');
 app.use('/', express.static(frontendDir));
+
+// Add photo guide route
+app.get('/photo-guide', (req, res) => {
+  res.sendFile(path.join(frontendDir, 'photo-guide.html'));
+});
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {

@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import fs from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -74,7 +75,7 @@ Please recommend 3 suitable attractions/restaurants/accommodation options, must 
     console.log(`💰 Budget:`, budget);
     
     if (!this.apiKey) {
-      console.log('❌ No Poe API key found, using mock data');
+      console.log('❌ No Poe API key found, using pool data');
       return this.getMockTravelCards(slotType);
     }
     
@@ -93,62 +94,15 @@ Please recommend 3 suitable attractions/restaurants/accommodation options, must 
       const prompt = `As a Hong Kong travel expert, recommend 3 options for ${typeMap[slotType] || 'attractions'}.
 User preferences: ${JSON.stringify(userProfile)}
 Weather: ${JSON.stringify(weatherData)}
-Budget: ${JSON.stringify(budget)}
-
-Please return standard JSON format with detailed information:
-{
-  "options": [
-    {
-      "option_id": "unique_id",
-      "title": "Location name",
-      "intro": "Brief introduction (within 50 words)",
-      "search_keywords": "English search keywords",
-      "reviews": [
-        {"author": "Username", "text": "Real review"}
-      ],
-      "transit": {"hint": "Transportation method"},
-      "scores": {
-        "popularity": 4.5,
-        "preference_match": 0.8,
-        "weather_fit": 0.9
-      },
-      "details": {
-        "address": "Detailed address",
-        "price_range": "Price range",
-        "opening_hours": "Operating hours",
-        "phone": "Phone number",
-        "highlights": ["Feature 1", "Feature 2", "Feature 3"]
-      }
-    }
-  ]
-}`;
+Budget: ${JSON.stringify(budget)}`;
       
-      console.log('🚀 Calling Poe API...');
-      const response = await this.invokeModel(prompt, true);
-      console.log('📥 Poe API response:', response.substring(0, 200) + '...');
+      console.log('🚀 POE API call prepared but using pool data instead');
+      // const response = await this.invokeModel(prompt, true);
       
-      const parsed = JSON.parse(response);
-      const options = parsed.options || [];
-      
-      // Add real images using Unsplash API
-      for (const option of options) {
-        const keywords = option.search_keywords || option.title;
-        try {
-          const imageData = await this.getUnsplashImage(keywords);
-          option.images = [imageData.url];
-          option.photographer = imageData.photographer;
-        } catch (error) {
-          console.error('Failed to get Unsplash image:', error);
-          option.images = [`https://picsum.photos/400/240?random=${Math.random()}`];
-          option.photographer = 'Unknown';
-        }
-      }
-      
-      console.log(`✅ Generated ${options.length} travel cards with real images`);
-      return options;
+      return this.getMockTravelCards(slotType);
     } catch (error) {
       console.error('❌ Poe API error generating cards:', error);
-      console.log('🔄 Falling back to mock data');
+      console.log('🔄 Falling back to pool data');
       return this.getMockTravelCards(slotType);
     }
   }
@@ -209,65 +163,78 @@ Please return standard JSON format with detailed information:
   }
 
   getMockTravelCards(slotType) {
-    const getRandomImage = () => `https://picsum.photos/400/240?random=${Math.random()}`;
-    
-    const cardTemplates = {
-      'morning': [
-        {
-          option_id: `${slotType}-1`,
-          title: 'Victoria Peak',
-          intro: 'Hong Kong\'s most famous viewpoint, overlooking Victoria Harbour',
-          images: [getRandomImage()],
-          reviews: [{author: 'Traveler A', text: 'Spectacular scenery, must-visit attraction!'}],
-          transit: {hint: 'Peak Tram 15 minutes'},
-          scores: {popularity: 4.8, preference_match: 0.9, weather_fit: 0.8},
-          details: {
-            address: 'Victoria Peak, Hong Kong Island',
-            price_range: 'HKD 65-99',
-            opening_hours: '07:00-24:00',
-            phone: '+852 2849 0668',
-            highlights: ['360-degree views', 'Peak Tram', 'Madame Tussauds']
-          }
-        }
+    try {
+      const poolPath = path.resolve(__dirname, '../pool.json');
+      const poolData = JSON.parse(fs.readFileSync(poolPath, 'utf8'));
+      
+      const typeMap = {
+        'breakfast': 'food', 'lunch': 'food', 'dinner': 'food',
+        'morning': 'poi', 'afternoon': 'poi', 'evening': 'poi', 'night': 'poi',
+        'accommodation': 'hotel'
+      };
+      
+      const poolType = typeMap[slotType] || 'poi';
+      const pool = poolData[poolType] || [];
+      
+      const shuffled = [...pool].sort(() => 0.5 - Math.random());
+      const selected = shuffled.slice(0, 3);
+      
+      return selected.map(item => ({
+        option_id: item.id,
+        title: item.name,
+        intro: item.intro || this.generateRecommendationReason(item.name, slotType),
+        images: [item.image || `https://picsum.photos/400/240?random=${Math.random()}`],
+        reviews: [{author: 'Traveler', text: 'Highly recommended!'}],
+        transit: {hint: item.traffic || 'MTR 10-15 minutes'},
+        traffic: item.traffic,
+        userComment: item.userComment,
+        scores: {popularity: item.rating, preference_match: 0.8, weather_fit: 0.9}
+      }));
+    } catch (error) {
+      console.error('Error loading pool data:', error);
+      return [{
+        option_id: `${slotType}-fallback`,
+        title: 'Victoria Peak',
+        intro: 'A stunning viewpoint offering panoramic views of Hong Kong.',
+        images: ['https://images.unsplash.com/photo-1518002171953-a080ee817e1f?w=400&h=240&fit=crop'],
+        reviews: [{author: 'Traveler', text: 'Amazing experience!'}],
+        transit: {hint: 'Peak Tram 15 minutes'},
+        scores: {popularity: 4.5, preference_match: 0.8, weather_fit: 0.9}
+      }];
+    }
+  }
+  
+  generateRecommendationReason(name, slotType) {
+    const reasons = {
+      poi: [
+        `${name} offers stunning views and unique cultural experiences perfect for sightseeing.`,
+        `A must-visit destination that showcases Hong Kong's rich heritage and modern charm.`,
+        `${name} provides excellent photo opportunities and memorable experiences.`,
+        `This iconic location perfectly captures the essence of Hong Kong's vibrant culture.`
       ],
-      'lunch': [
-        {
-          option_id: `${slotType}-1`,
-          title: '添好運點心專門店',
-          intro: '世界最便宜米其林一星餐廳，港式點心經典',
-          images: [getRandomImage()],
-          reviews: [{author: '美食家B', text: '性價比超高的米其林體驗'}],
-          transit: {hint: '地鐵深水埗站5分鐘'},
-          scores: {popularity: 4.6, preference_match: 0.8, weather_fit: 1.0},
-          details: {
-            address: '深水埗福榮街9-11號',
-            price_range: 'HKD 50-150',
-            opening_hours: '10:00-21:30',
-            phone: '+852 2788 1226',
-            highlights: ['米其林一星', '叉燒包', '酥皮焗叉燒包']
-          }
-        }
+      food: [
+        `${name} serves authentic Hong Kong cuisine with exceptional flavors and quality.`,
+        `A local favorite known for traditional recipes and outstanding service.`,
+        `${name} offers the perfect taste of Hong Kong's culinary heritage.`,
+        `Highly rated for its authentic dishes and welcoming atmosphere.`
       ],
-      'accommodation': [
-        {
-          option_id: `${slotType}-1`,
-          title: 'The Peninsula Hotel',
-          intro: 'Hong Kong\'s classic luxury hotel with excellent service in prime Tsim Sha Tsui location',
-          images: [getRandomImage()],
-          reviews: [{author: 'Business Traveler C', text: 'Impeccable service, excellent location'}],
-          transit: {hint: 'Airport Express 45 minutes'},
-          scores: {popularity: 4.9, preference_match: 0.9, weather_fit: 1.0},
-          details: {
-            address: 'Salisbury Road, Tsim Sha Tsui',
-            price_range: 'HKD 3000-8000',
-            opening_hours: '24 hours',
-            phone: '+852 2920 2888',
-            highlights: ['Luxury Service', 'Prime Location', 'Historic Heritage']
-          }
-        }
+      hotel: [
+        `${name} provides luxury accommodation with excellent location and amenities.`,
+        `Perfect for travelers seeking comfort and convenience in the heart of Hong Kong.`,
+        `${name} offers exceptional service and modern facilities for a memorable stay.`,
+        `Ideally located with easy access to major attractions and transportation.`
       ]
     };
-    return cardTemplates[slotType] || cardTemplates['morning'];
+    
+    const typeMap = {
+      'breakfast': 'food', 'lunch': 'food', 'dinner': 'food',
+      'morning': 'poi', 'afternoon': 'poi', 'evening': 'poi', 'night': 'poi',
+      'accommodation': 'hotel'
+    };
+    
+    const reasonType = typeMap[slotType] || 'poi';
+    const reasonList = reasons[reasonType];
+    return reasonList[Math.floor(Math.random() * reasonList.length)];
   }
 
   getMockRecommendations(budget) {
@@ -277,6 +244,93 @@ Please return standard JSON format with detailed information:
       { name: 'Peninsula Hotel', reason: 'Classic luxury hotel with excellent service', type: 'hotel' }
     ];
     return { recommendations };
+  }
+
+  async analyzePhoto(imageBase64, language = 'en', location = null) {
+    if (!this.apiKey) {
+      return this.getMockPhotoAnalysis(language, location);
+    }
+    
+    try {
+      const locationInfo = location ? `\nUser location: ${location.latitude}, ${location.longitude}` : '';
+      const prompt = language === 'zh' 
+        ? `分析這張香港景點照片，提供詳細的導遊介紹。${locationInfo}\n請以JSON格式回應：\n{\n  "title": "景點名稱",\n  "description": "詳細介紹",\n  "tags": ["標籤1", "標籤2"]\n}`
+        : `Analyze this Hong Kong attraction photo and provide detailed guide information.${locationInfo}\nRespond in JSON format:\n{\n  "title": "Attraction Name",\n  "description": "Detailed description",\n  "tags": ["tag1", "tag2"]\n}`;
+      
+      const response = await this.invokeModel(prompt, true);
+      return JSON.parse(response);
+    } catch (error) {
+      console.error('Photo analysis error:', error);
+      return this.getMockPhotoAnalysis(language, location);
+    }
+  }
+
+  getMockPhotoAnalysis(language = 'en', location = null) {
+    const mockData = {
+      en: {
+        title: 'Victoria Peak',
+        description: 'Victoria Peak is Hong Kong\'s most popular tourist attraction, offering breathtaking panoramic views of the city skyline, Victoria Harbour, and surrounding islands. At 552 meters above sea level, it provides the perfect vantage point to appreciate Hong Kong\'s stunning urban landscape.',
+        tags: ['Scenic Views', 'Tourist Attraction', 'Photography', 'Sunset Views', 'City Skyline']
+      },
+      zh: {
+        title: '太平山頂',
+        description: '太平山頂是香港最受歡迎的旅遊景點，可欣賞到令人嘆為觀止的城市天際線、維多利亞港和周圍島嶼的全景。海拔552米的高度為欣賞香港壯麗的都市景觀提供了完美的制高點。',
+        tags: ['風景觀賞', '旅遊景點', '攝影', '日落美景', '城市天際線']
+      }
+    };
+    return mockData[language] || mockData.en;
+  }
+
+  async generatePlanOverview(plan) {
+    if (!this.apiKey) {
+      return this.getMockPlanOverview(plan);
+    }
+    
+    try {
+      const selectedItems = [];
+      const slots = plan.itinerary?.[0]?.slots || [];
+      
+      slots.forEach(slot => {
+        const selected = slot.options.find(o => o.option_id === slot.selected_option_id);
+        if (selected) {
+          selectedItems.push(`${slot.slot_id}: ${selected.title}`);
+        }
+      });
+      
+      const prompt = `As a Hong Kong travel expert, analyze this travel plan and provide suggestions:\n\nSelected items: ${selectedItems.join(', ')}\nWeather: ${JSON.stringify(plan.context.weather)}\nBudget: ${JSON.stringify(plan.inputs.budget)}\n\nProvide a friendly overview with weather-based suggestions in 2-3 sentences.`;
+      
+      const response = await this.invokeModel(prompt, false);
+      return response;
+    } catch (error) {
+      console.error('Plan overview error:', error);
+      return this.getMockPlanOverview(plan);
+    }
+  }
+  
+  getMockPlanOverview(plan, currentSlots = null) {
+    // Use current slots if available, otherwise fall back to plan data
+    const slots = currentSlots || plan.itinerary?.[0]?.slots || [];
+    const selectedCount = slots.filter(s => s.selected_option_id).length;
+    const totalSlots = slots.length;
+    
+    // Get selected items for more personalized analysis
+    const selectedItems = [];
+    slots.forEach(slot => {
+      const selected = slot.options.find(o => o.option_id === slot.selected_option_id);
+      if (selected) {
+        selectedItems.push({ slot: slot.slot_id, name: selected.title });
+      }
+    });
+    
+    if (selectedCount === 0) {
+      return 'Welcome to your Hong Kong adventure! 🇭🇰 I notice you haven\'t selected your activities yet. Based on the current weather, I recommend starting with indoor attractions like museums or shopping malls, then moving to outdoor sightseeing when conditions are favorable.';
+    } else if (selectedCount < totalSlots / 2) {
+      const selectedNames = selectedItems.map(item => item.name).join(', ');
+      return `Great start on your Hong Kong itinerary! 🎯 You\'ve selected ${selectedCount} out of ${totalSlots} activities including ${selectedNames}. Based on the weather forecast, I suggest adding some flexible indoor options like shopping centers or cultural sites as backup plans. Don\'t forget to try local dim sum and take the Star Ferry for authentic Hong Kong experiences!`;
+    } else {
+      const highlights = selectedItems.slice(0, 3).map(item => item.name).join(', ');
+      return `Excellent Hong Kong travel plan! 🌟 You\'ve thoughtfully selected ${selectedCount} activities including ${highlights} and more. Your itinerary showcases the best of Hong Kong with a great mix of dining, attractions, and accommodation. Based on current weather conditions, remember to wear comfortable walking shoes and bring a light jacket for air-conditioned venues. Have an amazing trip!`;
+    }
   }
 
   getMockChatResponse(message) {
