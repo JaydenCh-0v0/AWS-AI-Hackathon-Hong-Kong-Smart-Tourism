@@ -1,4 +1,4 @@
-const API = 'http://localhost:3001';
+const API = window.location.hostname === 'localhost' ? 'http://localhost:3001' : '/api';
 let currentPlanId = null;
 let currentBudget = 'medium';
 let currentDayIndex = 0;

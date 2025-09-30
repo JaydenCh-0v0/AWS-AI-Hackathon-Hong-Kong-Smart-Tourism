@@ -1,5 +1,7 @@
 # Hong Kong Smart Tourism - AI-Powered Travel Planning Platform
 
+## Development time: 10 days 
+
 ## Project Overview
 
 Hong Kong Smart Tourism is an intelligent travel planning web application that leverages AI to create personalized, weather-aware itineraries for Hong Kong visitors. The platform combines real-time weather data, user preferences, and AI-powered recommendations to deliver a seamless travel planning experience through an intuitive swipe-based interface.

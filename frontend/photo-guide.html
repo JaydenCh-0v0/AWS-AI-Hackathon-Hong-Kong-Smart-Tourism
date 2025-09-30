@@ -411,7 +411,8 @@
           const base64 = await fileToBase64(uploadedImage);
           
           // Call AI analysis API
-          const response = await fetch('http://localhost:3001/analyze-photo', {
+          const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:3001' : '/api';
+          const response = await fetch(`${API_BASE}/analyze-photo`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
