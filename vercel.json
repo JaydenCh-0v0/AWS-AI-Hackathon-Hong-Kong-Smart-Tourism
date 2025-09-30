@@ -3,7 +3,10 @@
   "builds": [
     {
       "src": "backend/server.js",
-      "use": "@vercel/node@3.0.0"
+      "use": "@vercel/node@3.0.0",
+      "config": {
+        "runtime": "nodejs20.x"
+      }
     }
   ],
   "routes": [
