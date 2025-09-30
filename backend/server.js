@@ -145,8 +145,8 @@ function ensureEightSlots(plan) {
 }
 
 
-// POST /plans — create plan from inputs
-app.post('/plans', async (req, res) => {
+// POST /api/plans — create plan from inputs
+app.post('/api/plans', async (req, res) => {
   const { budget, date_range, locations } = req.body || {};
   const plan = createMinimalPlan({ budget, date_range, locations });
   // Weather mock per day (sunny/rainy alternating)
@@ -156,8 +156,8 @@ app.post('/plans', async (req, res) => {
   res.json({ plan_id: plan.plan_id });
 });
 
-// GET /weather?date=YYYY-MM-DD
-app.get('/weather', async (req, res) => {
+// GET /api/weather?date=YYYY-MM-DD
+app.get('/api/weather', async (req, res) => {
   try {
     const date = (req.query.date || '').toString();
     if (!/\d{4}-\d{2}-\d{2}/.test(date)) return res.status(400).json({ error: 'invalid date' });
@@ -175,8 +175,8 @@ app.get('/weather', async (req, res) => {
   }
 });
 
-// POST /plans/:id/answers — append Q&A
-app.post('/plans/:id/answers', (req, res) => {
+// POST /api/plans/:id/answers — append Q&A
+app.post('/api/plans/:id/answers', (req, res) => {
   const plan = plans.get(req.params.id);
   if (!plan) return res.status(404).json({ error: 'plan not found' });
   const payload = req.body || {};
@@ -185,8 +185,8 @@ app.post('/plans/:id/answers', (req, res) => {
   res.json({ ok: true });
 });
 
-// POST /plans/:id/generate — AI-enhanced generation
-app.post('/plans/:id/generate', async (req, res) => {
+// POST /api/plans/:id/generate — AI-enhanced generation
+app.post('/api/plans/:id/generate', async (req, res) => {
   const plan = plans.get(req.params.id);
   if (!plan) return res.status(404).json({ error: 'plan not found' });
   ensureEightSlots(plan);
@@ -220,8 +220,8 @@ app.post('/plans/:id/generate', async (req, res) => {
   }
 });
 
-// POST /plans/:id/swipe — record swipe and selection
-app.post('/plans/:id/swipe', async (req, res) => {
+// POST /api/plans/:id/swipe — record swipe and selection
+app.post('/api/plans/:id/swipe', async (req, res) => {
   const plan = plans.get(req.params.id);
   if (!plan) return res.status(404).json({ error: 'plan not found' });
   const { day_index, slot_id, action, option_id } = req.body || {};
@@ -252,23 +252,23 @@ app.post('/plans/:id/swipe', async (req, res) => {
   res.json({ ok: true, slot });
 });
 
-// GET /plans/:id — fetch plan
-app.get('/plans/:id', (req, res) => {
+// GET /api/plans/:id — fetch plan
+app.get('/api/plans/:id', (req, res) => {
   const plan = plans.get(req.params.id);
   if (!plan) return res.status(404).json({ error: 'plan not found' });
   res.json(ensureEightSlots(plan));
 });
 
-// POST /plans/:id/finalize — freeze
-app.post('/plans/:id/finalize', (req, res) => {
+// POST /api/plans/:id/finalize — freeze
+app.post('/api/plans/:id/finalize', (req, res) => {
   const plan = plans.get(req.params.id);
   if (!plan) return res.status(404).json({ error: 'plan not found' });
   plan.final_selection = { at: new Date().toISOString() };
   res.json({ ok: true });
 });
 
-// POST /plans/:id/export/pdf — return placeholder URL
-app.post('/plans/:id/export/pdf', (req, res) => {
+// POST /api/plans/:id/export/pdf — return placeholder URL
+app.post('/api/plans/:id/export/pdf', (req, res) => {
   const plan = plans.get(req.params.id);
   if (!plan) return res.status(404).json({ error: 'plan not found' });
   const url = `https://example.com/pdf/${plan.plan_id}.pdf`;
@@ -276,8 +276,8 @@ app.post('/plans/:id/export/pdf', (req, res) => {
   res.json({ url });
 });
 
-// POST /plans/:id/calendar — return ICS file content
-app.post('/plans/:id/calendar', (req, res) => {
+// POST /api/plans/:id/calendar — return ICS file content
+app.post('/api/plans/:id/calendar', (req, res) => {
   const plan = plans.get(req.params.id);
   if (!plan) return res.status(404).json({ error: 'plan not found' });
   // Build one event for demo
@@ -295,8 +295,8 @@ app.post('/plans/:id/calendar', (req, res) => {
   res.send(value);
 });
 
-// POST /plans/:id/chat — AI chat endpoint
-app.post('/plans/:id/chat', async (req, res) => {
+// POST /api/plans/:id/chat — AI chat endpoint
+app.post('/api/plans/:id/chat', async (req, res) => {
   const plan = plans.get(req.params.id);
   if (!plan) return res.status(404).json({ error: 'plan not found' });
   
@@ -327,8 +327,8 @@ app.post('/plans/:id/chat', async (req, res) => {
   }
 });
 
-// POST /analyze-photo — Photo guide analysis
-app.post('/analyze-photo', async (req, res) => {
+// POST /api/analyze-photo — Photo guide analysis
+app.post('/api/analyze-photo', async (req, res) => {
   const { image, language = 'en', location } = req.body || {};
   if (!image) return res.status(400).json({ error: 'image required' });
   
@@ -341,8 +341,8 @@ app.post('/analyze-photo', async (req, res) => {
   }
 });
 
-// POST /plans/:id/overview — Generate AI plan overview
-app.post('/plans/:id/overview', async (req, res) => {
+// POST /api/plans/:id/overview — Generate AI plan overview
+app.post('/api/plans/:id/overview', async (req, res) => {
   const plan = plans.get(req.params.id);
   if (!plan) return res.status(404).json({ error: 'plan not found' });
   
