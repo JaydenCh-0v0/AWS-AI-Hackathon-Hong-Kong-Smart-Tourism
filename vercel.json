@@ -1,22 +1,27 @@
 {
   "version": 2,
-  "functions": {
-    "backend/server.js": {
-      "runtime": "nodejs18.x"
+  "builds": [
+    {
+      "src": "backend/server.js",
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": ["backend/**"]
+      }
     }
-  },
+  ],
   "routes": [
     {
       "src": "/api/(.*)",
       "dest": "/backend/server.js"
     },
     {
-      "src": "/(.*\\.(css|js|png|jpg|jpeg|gif|ico|svg))",
-      "dest": "/frontend/$1"
-    },
-    {
       "src": "/(.*)",
       "dest": "/frontend/$1"
     }
-  ]
+  ],
+  "functions": {
+    "backend/server.js": {
+      "includeFiles": "backend/**"
+    }
+  }
 }
