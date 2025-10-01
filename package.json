@@ -1,15 +1,10 @@
 {
-  "name": "hk-travel-backend",
-  "version": "0.1.0",
-  "private": true,
+  "name": "hk-smart-tourism",
+  "version": "1.0.0",
   "type": "module",
-  "main": "server.js",
-  "engines": {
-    "node": ">=20.0.0"
-  },
   "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js"
+    "build": "echo 'No build step required'",
+    "start": "node backend/server.js"
   },
   "dependencies": {
     "@aws-sdk/client-bedrock-runtime": "^3.894.0",
@@ -21,5 +16,8 @@
     "node-fetch": "^3.3.2",
     "openai": "^4.104.0",
     "zod": "^3.23.8"
+  },
+  "engines": {
+    "node": ">=20.0.0"
   }
 }
